@@ -4,69 +4,85 @@ type token =
   | Lpar
   | Rpar
   | EOL
-  | Cst of (
+  | Comment
+  | Cst_int of (
 # 6 "parser.mly"
         int
-# 11 "parser.ml"
+# 12 "parser.ml"
+)
+  | Cst_float of (
+# 7 "parser.mly"
+        float
+# 17 "parser.ml"
+)
+  | Cst_bool of (
+# 8 "parser.mly"
+        bool
+# 22 "parser.ml"
 )
   | Id of (
-# 7 "parser.mly"
+# 9 "parser.mly"
         string
-# 16 "parser.ml"
+# 27 "parser.ml"
 )
 
 open Parsing
 let _ = parse_error;;
 # 2 "parser.mly"
     open Ast
-# 23 "parser.ml"
+# 34 "parser.ml"
 let yytransl_const = [|
   257 (* Plus *);
   258 (* Times *);
   259 (* Lpar *);
   260 (* Rpar *);
   261 (* EOL *);
+  262 (* Comment *);
     0|]
 
 let yytransl_block = [|
-  262 (* Cst *);
-  263 (* Id *);
+  263 (* Cst_int *);
+  264 (* Cst_float *);
+  265 (* Cst_bool *);
+  266 (* Id *);
     0|]
 
 let yylhs = "\255\255\
-\001\000\002\000\002\000\002\000\002\000\002\000\000\000"
+\001\000\002\000\002\000\002\000\002\000\002\000\002\000\002\000\
+\000\000"
 
 let yylen = "\002\000\
-\002\000\003\000\003\000\003\000\001\000\001\000\002\000"
+\002\000\003\000\003\000\003\000\001\000\001\000\001\000\001\000\
+\002\000"
 
 let yydefred = "\000\000\
-\000\000\000\000\000\000\005\000\006\000\007\000\000\000\000\000\
-\000\000\000\000\001\000\004\000\000\000\000\000"
+\000\000\000\000\000\000\005\000\006\000\007\000\008\000\009\000\
+\000\000\000\000\000\000\000\000\001\000\004\000\000\000\000\000"
 
 let yydgoto = "\002\000\
-\006\000\007\000"
+\008\000\009\000"
 
-let yysindex = "\001\000\
-\254\254\000\000\254\254\000\000\000\000\000\000\007\255\019\255\
-\254\254\254\254\000\000\000\000\001\255\001\255"
+let yysindex = "\002\000\
+\003\255\000\000\003\255\000\000\000\000\000\000\000\000\000\000\
+\000\255\020\255\003\255\003\255\000\000\000\000\002\255\002\255"
 
 let yyrindex = "\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\009\255\014\255"
+\000\000\000\000\000\000\000\000\000\000\000\000\013\255\015\255"
 
 let yygindex = "\000\000\
 \000\000\253\255"
 
-let yytablesize = 23
-let yytable = "\008\000\
-\003\000\001\000\010\000\004\000\005\000\013\000\014\000\009\000\
-\010\000\002\000\000\000\011\000\002\000\002\000\003\000\000\000\
-\000\000\003\000\003\000\009\000\010\000\000\000\012\000"
+let yytablesize = 24
+let yytable = "\010\000\
+\011\000\012\000\001\000\012\000\013\000\003\000\000\000\015\000\
+\016\000\004\000\005\000\006\000\007\000\002\000\000\000\003\000\
+\002\000\002\000\003\000\003\000\011\000\012\000\000\000\014\000"
 
 let yycheck = "\003\000\
-\003\001\001\000\002\001\006\001\007\001\009\000\010\000\001\001\
-\002\001\001\001\255\255\005\001\004\001\005\001\001\001\255\255\
-\255\255\004\001\005\001\001\001\002\001\255\255\004\001"
+\001\001\002\001\001\000\002\001\005\001\003\001\255\255\011\000\
+\012\000\007\001\008\001\009\001\010\001\001\001\255\255\001\001\
+\004\001\005\001\004\001\005\001\001\001\002\001\255\255\004\001"
 
 let yynames_const = "\
   Plus\000\
@@ -74,10 +90,13 @@ let yynames_const = "\
   Lpar\000\
   Rpar\000\
   EOL\000\
+  Comment\000\
   "
 
 let yynames_block = "\
-  Cst\000\
+  Cst_int\000\
+  Cst_float\000\
+  Cst_bool\000\
   Id\000\
   "
 
@@ -86,46 +105,60 @@ let yyact = [|
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
-# 16 "parser.mly"
+# 18 "parser.mly"
              ( _1 )
-# 92 "parser.ml"
+# 111 "parser.ml"
                : Ast.ast))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
-# 21 "parser.mly"
+# 23 "parser.mly"
                          ( Plus(_1,_3) )
-# 100 "parser.ml"
+# 119 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
-# 22 "parser.mly"
+# 24 "parser.mly"
                           ( Times(_1,_3) )
-# 108 "parser.ml"
+# 127 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
-# 23 "parser.mly"
+# 25 "parser.mly"
                          ( Group(_2) )
-# 115 "parser.ml"
+# 134 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : int) in
     Obj.repr(
-# 24 "parser.mly"
-              ( Cst(_1) )
-# 122 "parser.ml"
+# 26 "parser.mly"
+                  ( Cst_int(_1) )
+# 141 "parser.ml"
+               : 'expr))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 0 : float) in
+    Obj.repr(
+# 27 "parser.mly"
+                    ( Cst_float(_1) )
+# 148 "parser.ml"
+               : 'expr))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 0 : bool) in
+    Obj.repr(
+# 28 "parser.mly"
+                   ( Cst_bool(_1) )
+# 155 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : string) in
     Obj.repr(
-# 25 "parser.mly"
+# 29 "parser.mly"
              ( Id(_1) )
-# 129 "parser.ml"
+# 162 "parser.ml"
                : 'expr))
 (* Entry s *)
 ; (fun __caml_parser_env -> raise (Parsing.YYexit (Parsing.peek_val __caml_parser_env 0)))

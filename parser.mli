@@ -4,15 +4,26 @@ type token =
   | Lpar
   | Rpar
   | EOL
-  | Cst of (
+  | Comment
+  | Cst_int of (
 # 6 "parser.mly"
         int
-# 11 "parser.mli"
+# 12 "parser.mli"
+)
+  | Cst_float of (
+# 7 "parser.mly"
+        float
+# 17 "parser.mli"
+)
+  | Cst_bool of (
+# 8 "parser.mly"
+        bool
+# 22 "parser.mli"
 )
   | Id of (
-# 7 "parser.mly"
+# 9 "parser.mly"
         string
-# 16 "parser.mli"
+# 27 "parser.mli"
 )
 
 val s :

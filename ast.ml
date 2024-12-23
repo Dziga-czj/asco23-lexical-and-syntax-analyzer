@@ -2,7 +2,9 @@ type ast =
   | Group of ast
   | Plus of ast * ast
   | Times of ast * ast
-  | Cst of int
+  | Cst_int of int
+  | Cst_float of float
+  | Cst_bool of bool
   | Id of string
 
      
@@ -13,7 +15,8 @@ let rec print_sep_spec = function
   | [] -> ()
   | [x] -> print_string "|-"
   | x :: q -> print_string x; print_sep_spec q
-    
+
+
 let rec aff_aux a =
   match a with
   | Group(a1) -> 
@@ -28,7 +31,9 @@ let rec aff_aux a =
     aff_aux a1;
     print_string "*";
     aff_aux a2;
-  | Cst i -> Printf.printf "Cte(%i)" i
+  | Cst_int i -> Printf.printf "Cst(%i)" i
+  | Cst_bool i -> if i then Printf.printf "Cst_bool(true)" else Printf.printf "Cst_bool(false)"
+  | Cst_float i -> Printf.printf "Cst_float(%f)" i
 
   | Id s -> Printf.printf "Id(%s)" s
 
