@@ -18,7 +18,7 @@ type token =
 open Parsing
 let _ = parse_error;;
 # 2 "parser.mly"
-    open Ast  
+    open Ast
 # 23 "parser.ml"
 let yytransl_const = [|
   257 (* Plus *);
@@ -86,7 +86,7 @@ let yyact = [|
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
-# 14 "parser.mly"
+# 16 "parser.mly"
              ( _1 )
 # 92 "parser.ml"
                : Ast.ast))
@@ -94,36 +94,36 @@ let yyact = [|
     let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
-# 17 "parser.mly"
-                         ( Printf.printf "t\n";Plus(_1,_3) )
+# 21 "parser.mly"
+                         ( Plus(_1,_3) )
 # 100 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
-# 18 "parser.mly"
+# 22 "parser.mly"
                           ( Times(_1,_3) )
 # 108 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
-# 19 "parser.mly"
-                         ( Printf.printf "tes\n";Group(_2) )
+# 23 "parser.mly"
+                         ( Group(_2) )
 # 115 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : int) in
     Obj.repr(
-# 20 "parser.mly"
-              ( Printf.printf "%d " _1;Cst(_1) )
+# 24 "parser.mly"
+              ( Cst(_1) )
 # 122 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : string) in
     Obj.repr(
-# 21 "parser.mly"
+# 25 "parser.mly"
              ( Id(_1) )
 # 129 "parser.ml"
                : 'expr))

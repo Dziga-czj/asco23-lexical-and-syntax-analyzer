@@ -19,24 +19,23 @@ let rec aff_aux l a =
   print_sep_spec l;
   match a with
   | Group(a) -> 
-    Printf.printf("trouvé\n");
-    print_string "(";
-    aff_aux (l @ [")\n"]) a;
+    print_string "Lpar";
+    aff_aux l a;
+    print_string "RPar";
   | Plus(a1, a2) ->
-    print_string "Plus\n";
-    print_sep (l @ ["|\n"]);
-    aff_aux (l @ ["| "]) a1;
-    print_sep (l @ ["|\n"]);
-    aff_aux (l @ ["  "]) a2
+    print_string "Plus(";
+    aff_aux (l @ [" "]) a1;
+    print_sep (l @ ["|"]);
+    aff_aux (l @ [")"]) a2
   | Times(a1, a2) ->
-    print_string "Fois\n";
-    print_sep (l @ ["|\n"]);
+    print_string "Fois";
+    print_sep (l @ ["|"]);
     aff_aux (l @ ["| "]) a1;
-    print_sep (l @ ["|\n"]);
+    print_sep (l @ ["|"]);
     aff_aux (l @ ["  "]) a2
-  | Cst i -> Printf.printf "Cte(%i)\n" i
+  | Cst i -> Printf.printf "Cte(%i)" i
 
-  | Id s -> Printf.printf "Id(%s)\n" s
+  | Id s -> Printf.printf "Id(%s)" s
 
 let affiche = aff_aux []
   

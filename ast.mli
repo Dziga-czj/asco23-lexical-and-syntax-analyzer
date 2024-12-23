@@ -1,5 +1,5 @@
 type ast =
-    Group of ast
+  | Group of ast
   | Plus of ast * ast
   | Times of ast * ast
   | Cst of int
