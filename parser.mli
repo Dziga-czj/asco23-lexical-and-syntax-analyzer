@@ -29,30 +29,39 @@ type token =
   | PVirgule
   | Virgule
   | DPoints
+  | Var_decl
+  | If
+  | Else
+  | While
+  | Return
+  | Type
+  | Let
+  | Const
+  | Function
   | Cst_int of (
 # 6 "parser.mly"
         int
-# 36 "parser.mli"
+# 45 "parser.mli"
 )
   | Cst_float of (
 # 7 "parser.mly"
         float
-# 41 "parser.mli"
+# 50 "parser.mli"
 )
   | Cst_bool of (
 # 8 "parser.mly"
         bool
-# 46 "parser.mli"
+# 55 "parser.mli"
 )
   | Cst_string of (
 # 9 "parser.mly"
         string
-# 51 "parser.mli"
+# 60 "parser.mli"
 )
   | Id of (
 # 10 "parser.mly"
         string
-# 56 "parser.mli"
+# 65 "parser.mli"
 )
 
 val s :

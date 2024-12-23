@@ -2,7 +2,7 @@
     open Ast
 %}
 
-%token Plus Times Lpar Rpar EOL Comment Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints
+%token Plus Times Lpar Rpar EOL Comment Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints Var_decl If Else While Return Type Let Const Function
 %token <int> Cst_int
 %token <float> Cst_float
 %token <bool> Cst_bool

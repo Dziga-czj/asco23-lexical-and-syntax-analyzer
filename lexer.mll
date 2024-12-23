@@ -38,6 +38,15 @@ rule decoupe = parse
 | ';' { PVirgule }
 | ',' { Virgule }
 | ':' { DPoints }
+| "var" { Var_decl }
+| "if" { If }
+| "else" { Else }
+| "while" { While }
+| "return" { Return }
+| "type" { Type }
+| "let" { Let }
+| "const" { Const }
+| "function" { Function }
 (*------------------------- constantes -------------------------*)
 (* const decimales *)
 | ['1'-'9']['0'-'9''_']* as i { Cst_int (int_of_string2 i) }
