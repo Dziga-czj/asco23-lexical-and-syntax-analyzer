@@ -8,7 +8,28 @@ type ast =
   | Cst_string of string
   | Id of string
 
-     
+type type_ = 
+
+type left_mem = 
+  | id
+  | Tab of (expr, expr)
+  | Point_sep of (expr, id)
+
+type expr = 
+  | Par of expr
+  | Cst_int of int
+  | Cst_float of float
+  | Cst_bool of bool
+  | left_mem
+  |
+
+type instr = 
+
+type decl =
+
+type id = Id of string
+
+
 let print_sep l =
   List.iter print_string l
 
