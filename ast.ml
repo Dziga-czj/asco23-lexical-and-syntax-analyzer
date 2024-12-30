@@ -1,33 +1,68 @@
-type ast =
-  | Group of ast
-  | Plus of ast * ast
-  | Times of ast * ast
-  | Cst_int of int
+
+type id = Id of string
+
+type const =    
   | Cst_float of float
   | Cst_bool of bool
   | Cst_string of string
-  | Id of string
+
+type prim =
+  | Number of int 
+  | Bool of bool
+  | String of string
+
+type ast = Nil
+
+
 
 type type_ = 
+  | Id of string
 
-type left_mem = 
-  | id
-  | Tab of (expr, expr)
-  | Point_sep of (expr, id)
 
-type expr = 
+
+
+(* and sers a ce que il reconaisse tout les types en même temps pour pouvoir les utiliser mutuellement *)
+and left = 
+  | Id of string
+  | Tab_affect of (expr * expr) (* e[e] *)
+  | Point_sep of (expr * id) (* e.i *)
+
+and expr = 
   | Par of expr
-  | Cst_int of int
-  | Cst_float of float
-  | Cst_bool of bool
-  | left_mem
-  |
+  | Cst of const
+  | Left_mem of left
+  | Object of (id * expr) list
+  | Tab of expr list
+  | Func_call of (expr * expr list)
+  | Typeof of expr
+  | Plus of expr (* +e *)
+  | Minus of expr (* -e *)
+  | Exp of expr * expr
+  | Mul of expr * expr 
+  | Div of expr * expr 
+  | Add of expr * expr (* e+e *)
+  | Sub of expr * expr (* e-e *)
+  | GT of expr * expr (* > *)
+  | GE of expr * expr (* >= *)
+  | LT of expr * expr (* < *)
+  | LE of expr * expr (* <= *)  
+  | Eq of expr * expr (* == *)  
+  | Diff of expr * expr (* != *)  
+  | Triple_eq of expr * expr (* === *)  
+  | Double_diff of expr * expr (* !== *)  
+  | Conj of expr * expr (* && *)  
+  | Disj of expr * expr (* || *)  
+  | Affect of left * expr (* l = e *)
 
-type instr = 
 
-type decl =
+and instr = 
+  | Id of string
+  | Const of const
+  | Primitif of prim
 
-type id = Id of string
+and decl = Nil
+
+
 
 
 let print_sep l =
@@ -40,6 +75,7 @@ let rec print_sep_spec = function
 
 
 let rec aff_aux a =
+  (*
   match a with
   | Group(a1) -> 
     print_string "(";
@@ -58,6 +94,8 @@ let rec aff_aux a =
   | Cst_float i -> Printf.printf "Cst_float(%f)" i
   | Cst_string s -> print_string s; print_newline ();
   | Id s -> Printf.printf "Id(%s)" s
-
+    *)
+    failwith "TODO avec le nouvel arbre ou un type partiel pour tester"
 let affiche = aff_aux
+    
   

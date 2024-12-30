@@ -18,7 +18,7 @@
 
 
 s : expr EOL { $1 }
-
+(* a compléter avec les types dans ast.ml (remplir le type en fonction de la tête que ca a, tu peux les changer bien entendu) *)
 expr :  
         | expr Plus expr { Plus($1,$3) }
         | expr Times expr { Times($1,$3) }
