@@ -60,32 +60,33 @@ instr :
 
 (* Expressions *)
 
-expr :
-  | Cst_int { Cst (Cst_int $1) } 
-  | Cst_float { Cst (Cst_float $1) } 
-  | Cst_bool { Cst (Cst_bool $1) } 
-  | Cst_string { Cst (Cst_string $1) } 
-  | Id { Left_mem (Id $1) } (* Identifiant *)
-  | Lpar expr Rpar { Par $2 } 
-  | expr Plus expr { Add ($1, $3) } 
-  | expr Minus expr { Sub ($1, $3) } 
-  | expr Times expr { Mul ($1, $3) } 
-  | expr Div expr { Div ($1, $3) }
-  | expr Exp expr { Exp ($1, $3) }
-  | expr Comp_lt expr { LT ($1, $3) } (* inférieur *)
-  | expr Comp_le expr { LE ($1, $3) } (* inférieur ou égal *)
-  | expr Comp_gt expr { GT ($1, $3) } (* supérieur *)
-  | expr Comp_ge expr { GE ($1, $3) } (* supérieur ou égal *)
-  | expr Double_eq expr { Eq ($1, $3) } (* égalité *)
-  | expr Diff expr { Diff ($1, $3) } (* différence *)
-  | expr Triple_eq expr { Triple_eq ($1, $3) } (* égalité stricte *)
-  | expr Double_diff expr { Double_diff ($1, $3) } (* différence stricte *)
-  | expr And expr { Conj ($1, $3) } (* ET *)
-  | expr Or expr { Disj ($1, $3) } (* OU *)
-  | Typeof expr { Typeof $2 } (* typeof e *)
-  | LBracket expr_list RBracket { Tab $2 } (* tableau *)
-  | LAcc obj_list RAcc { Object $2 } (* objet *)
-  | expr Lpar expr_list Rpar { Func_call ($1, $3) } (* appel de fonction *)
+expr : 
+    | Cst_int { Cst (Cst_float (float_of_int $1)) }
+    | Cst_float { Cst (Cst_float $1) }
+    | Cst_bool { Cst (Cst_bool $1) }
+    | Cst_string { Cst (Cst_string $1) }
+    | left_mem { $1 } 
+    | Lpar expr Rpar { Par $2 }
+    | expr Plus expr { Add ($1, $3) }
+    | expr Minus expr { Sub ($1, $3) }
+    | expr Times expr { Mul ($1, $3) }
+    | expr Div expr { Div ($1, $3) }
+    | expr Exp expr { Exp ($1, $3) }
+    | expr Comp_lt expr { LT ($1, $3) }
+    | expr Comp_le expr { LE ($1, $3) }
+    | expr Comp_gt expr { GT ($1, $3) }
+    | expr Comp_ge expr { GE ($1, $3) }
+    | expr Double_eq expr { Eq ($1, $3) }
+    | expr Diff expr { Diff ($1, $3) }
+    | expr Triple_eq expr { Triple_eq ($1, $3) }
+    | expr Double_diff expr { Double_diff ($1, $3) }
+    | expr And expr { Conj ($1, $3) }
+    | expr Or expr { Disj ($1, $3) }
+    | Typeof expr { Typeof $2 }
+    | LBracket expr_list RBracket { Tab $2 }
+    | LAcc obj_list RAcc { Object $2 }
+    | expr Lpar expr_list Rpar { Func_call ($1, $3) }
+
 
 expr_list :
   | expr { [$1] } 
@@ -109,8 +110,13 @@ bindings :
   | binding { [$1] } (* une déclaration *)
   | binding Virgule bindings { $1 :: $3 } (* plusieurs déclarations *)
 
+left_mem :
+    | Id { Left_mem (Id $1) }
+    | expr LBracket expr RBracket { Left_mem (ArrayAccess ($1, $3)) }
+    | expr DPoint Id { Left_mem (FieldAccess ($1, $3)) }
 
 type_expr : 
   | Type_num { TypeNum }
   | Type_bool { TypeBool }
   | Type_string { TypeString }
+
