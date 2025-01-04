@@ -37,15 +37,6 @@ decl_instr_list :
 
 (* Déclarations *)
 
-param_list :
-    |   { [] } 
-    | Id { [$1] } 
-    | Id Virgule param_list { $1 :: $3 } 
-
-return_type :
-    |   { None } 
-    | DPoints type_expr { Some $2 } 
-
 decl :
   | Type Id Eq type_expr PVirgule { TypeAlias ($2, $4) } 
   | Let bindings PVirgule { LetDecl $2 } 
@@ -120,7 +111,7 @@ bindings :
 left_mem :
     | Id { Left_mem (Id $1) }
     | expr LBracket expr RBracket { Left_mem (ArrayAccess ($1, $3)) }
-    | expr DPoints Id { Left_mem (FieldAccess ($1, $3)) }
+    | expr DPoint Id { Left_mem (FieldAccess ($1, $3)) }
 
 type_expr : 
   | Type_num { TypeNum }
