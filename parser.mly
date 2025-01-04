@@ -18,12 +18,12 @@
 %right Exp
 
 %start s
-%type <Ast.program> s
+%type <Ast.ast> s
 %%
 (* Entrée principale du programme *)
 
 s : 
-  | decl_instr_list EOL { Program $1 } (* prend une liste de déclarations ou instructions *)
+  | decl_instr_list EOL { ast $1 } (* prend une liste de déclarations ou instructions *)
 
 (* Déclarations et instructions *)
 
