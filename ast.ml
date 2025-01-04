@@ -14,11 +14,8 @@ type prim =
 type ast = Nil
 
 
-
 type type_ = 
   | Id of string
-
-
 
 
 (* and sers a ce que il reconaisse tout les types en même temps pour pouvoir les utiliser mutuellement *)
@@ -61,9 +58,6 @@ and instr =
   | Primitif of prim
 
 and decl = Nil
-
-
-
 
 let print_sep l =
   List.iter print_string l
