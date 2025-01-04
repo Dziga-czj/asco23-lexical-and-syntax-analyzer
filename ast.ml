@@ -2,21 +2,26 @@
 type id = Id of string
 
 type const =    
+  | Cst_int of int
   | Cst_float of float
   | Cst_bool of bool
   | Cst_string of string
 
 type prim =
-  | Number of int 
+  | Num of int
   | Bool of bool
-  | String of string
-
-type ast = Nil
-
+  | Str of string
 
 type type_ = 
-  | Id of string
-
+  | Identifiant
+  | Constante
+  | Number
+  | Boolean
+  | String
+  | Tableau
+  | Any
+  | Object
+  | Union
 
 (* and sers a ce que il reconaisse tout les types en même temps pour pouvoir les utiliser mutuellement *)
 and left = 
@@ -28,7 +33,7 @@ and expr =
   | Par of expr
   | Cst of const
   | Left_mem of left
-  | Object of (id * expr) list
+  | Obj of (id * expr) list
   | Tab of expr list
   | Func_call of (expr * expr list)
   | Typeof of expr
@@ -51,13 +56,37 @@ and expr =
   | Disj of expr * expr (* || *)  
   | Affect of left * expr (* l = e *)
 
-
 and instr = 
-  | Id of string
-  | Const of const
-  | Primitif of prim
+  | Vide
+  | Pt_virgule of expr
+  | Bloc of inst_or_decl list
+  | Var_decl of binding list
+  | If of expr * instr
+  | If_else of expr * instr * instr
+  | While of expr * instr
+  | Simple_return
+  | Return of expr
 
-and decl = Nil
+and binding =  
+  | Bind_Simple of id (* var a*)
+  | Bind_Double of id * type_ * expr (* var a : type = expr; *)
+  | Bind_typed of id * type_ (* var a : type;*)
+  | Bind_expr of id * expr (* var a = expr; *)
+
+and inst_or_decl = 
+  | I_or_D_instr of instr 
+  | I_or_D_decl of decl
+
+and decl = 
+  | Type_alias of id * type_
+  | Let_decl of binding list
+  | Const_decl of binding list
+  | Func_decl of instr * binding list * 
+  | Func_decl_typed instr * binding list * type_ * inst_or_decl list
+
+and ast = inst_or_decl list
+
+
 
 let print_sep l =
   List.iter print_string l

@@ -98,7 +98,18 @@ obj_list :
   | Id DPoints expr { [($1, $3)] } 
   | Id DPoints expr Virgule obj_list { ($1, $3) :: $5 } 
 
-(* Bindings *)
+instr : 
+    | PVirgule { Vide }
+    | Var_decl Id Eq expr { Affect (Id $2, $4) }
+    | Const Id Eq expr { Affect (Id $2, $4) }
+    | Let Id Eq expr { Affect (Id $2, $4) }
+    | Return expr { $2 }
+    | If expr instr { If ($2, $3, Nil) }
+    | If expr instr Else instr { If ($2, $3, $5) }
+    | While expr instr { While ($2, $3) }
+    | Function Id Lpar param_list Rpar LAcc instr_list RAcc { 
+        Func_call (Id $2, $7)
+      }
 
 binding :
   | Id { Binding ($1, None, None) } (* i *)

@@ -28,6 +28,7 @@ rule decoupe = parse
 | "!==" { Double_diff }
 | "&&" { And }
 | "||" { Or }
+| "int" { Type_int }
 | "number" { Type_num }
 | "boolean" { Type_bool }
 | "string" { Type_string }
