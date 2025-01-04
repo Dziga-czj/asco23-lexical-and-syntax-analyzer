@@ -121,7 +121,7 @@ bindings :
 left_mem :
     | Id { Left_mem (Id $1) }
     | expr LBracket expr RBracket { Left_mem (ArrayAccess ($1, $3)) }
-    | expr DPoint Id { Left_mem (FieldAccess ($1, $3)) }
+    | expr DPoints Id { Left_mem (FieldAccess ($1, $3)) }
 
 type_expr : 
   | Type_num { TypeNum }
