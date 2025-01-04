@@ -42,7 +42,7 @@ decl :
   | Let bindings PVirgule { LetDecl $2 } 
   | Const bindings PVirgule { ConstDecl $2 } 
   | Function Id Lpar param_list Rpar return_type LAcc decl_instr_list RAcc { 
-      FuncDecl ($2, $4, $5, $7) 
+      FuncDecl ($2, $4, $6, $8) 
     } (* function i(as) to { dis } voir énoncé *)
 
 (* Instructions *)
