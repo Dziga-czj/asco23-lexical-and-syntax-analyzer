@@ -81,8 +81,8 @@ and decl =
   | Type_alias of id * type_
   | Let_decl of binding list
   | Const_decl of binding list
-  | Func_decl of instr * binding list * 
-  | Func_decl_typed instr * binding list * type_ * inst_or_decl list
+  | Func_decl of instr * binding list * inst_or_decl list
+  | Func_decl_typed of instr * binding list * type_ * inst_or_decl list
 
 and ast = inst_or_decl list
 
