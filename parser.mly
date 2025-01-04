@@ -50,7 +50,7 @@ decl :
   | Type Id Eq type_expr PVirgule { Type_alias (Id $2, $4) }
   | Let bindings PVirgule { Let_decl $2 }
   | Const bindings PVirgule { Const_decl $2 }
-  | Function Id Lpar param_list Rpar return_type LAcc decl_instr_list RAcc { 
+  | Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc { 
     Func_decl (Id($2), $4, $6, $8) 
 }
 

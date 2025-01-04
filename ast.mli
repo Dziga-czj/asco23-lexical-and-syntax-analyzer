@@ -57,7 +57,7 @@ and expr =
   | Affect of left * expr (* l = e *)
 
 and instr = 
-  | Vide
+  | Empty
   | Pt_virgule of expr
   | Bloc of inst_or_decl list
   | Var_decl of binding list
