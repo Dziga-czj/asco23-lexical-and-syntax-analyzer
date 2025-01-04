@@ -23,13 +23,13 @@
 (* Entrée principale du programme *)
 
 s : 
-  | decl_instr_list EOL { ast $1 } (* prend une liste de déclarations ou instructions *)
+  | decl_instr_list EOL { $1 } (* prend une liste de déclarations ou instructions *)
 
 (* Déclarations et instructions *)
 
 decl_instr :
-  | decl { Decl $1 } (* une déclaration *)
-  | instr { Instr $1 } (* une instruction *)
+  | decl { I_or_D_decl $1 } (* une déclaration *)
+  | instr { I_or_D_instr $1 } (* une instruction *)
 
 decl_instr_list :
   | decl_instr { [$1] } (* une seule déclaration ou instruction *)
@@ -46,13 +46,14 @@ return_type :
     |   { None } 
     | DPoints type_expr { Some $2 } 
 
-decl :
-  | Type Id Eq type_expr PVirgule { TypeAlias ($2, $4) } 
-  | Let bindings PVirgule { LetDecl $2 } 
-  | Const bindings PVirgule { ConstDecl $2 } 
+decl : 
+  | Type Id Eq type_expr PVirgule { Type_alias (Id $2, $4) }
+  | Let bindings PVirgule { Let_decl $2 }
+  | Const bindings PVirgule { Const_decl $2 }
   | Function Id Lpar param_list Rpar return_type LAcc decl_instr_list RAcc { 
-      FuncDecl ($2, $4, $6, $8) 
-    } (* function i(as) to { dis } voir énoncé *)
+    Func_decl ($2, $4, $8) 
+}
+
 
 (* Instructions *)
 
