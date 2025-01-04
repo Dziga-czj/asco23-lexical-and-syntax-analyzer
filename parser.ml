@@ -574,7 +574,7 @@ let yyact = [|
     Obj.repr(
 # 53 "parser.mly"
                                                                            ( 
-    Func_decl (Id _2, _4, _8) 
+    Func_decl (Id(_2), _4, _6, _8) 
 )
 # 580 "parser.ml"
                : 'decl))
