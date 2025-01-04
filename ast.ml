@@ -64,8 +64,7 @@ and instr =
   | If of expr * instr
   | If_else of expr * instr * instr
   | While of expr * instr
-  | Simple_return
-  | Return of expr
+  | Return of expr option
 
 and binding =  
   | Bind_Simple of id (* var a*)

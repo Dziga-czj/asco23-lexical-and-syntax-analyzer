@@ -59,11 +59,11 @@ decl :
 
 instr :
   | PVirgule { Empty } (* ; *)
-  | expr PVirgule { Expr ($1) } (* e; *)
-  | LAcc decl_instr_list RAcc { Block $2 } (* { ... } *)
-  | Var_decl bindings PVirgule { VarDecl $2 } (* var bs; *)
-  | If Lpar expr Rpar instr { If ($3, $5, Nil) } (* if (e) i *)
-  | If Lpar expr Rpar instr Else instr { If ($3, $5, $7) } (* if (e) i1 else i2 *)
+  | expr PVirgule { Pt_virgule ($1) } (* e; *)
+  | LAcc decl_instr_list RAcc { Bloc $2 } (* { ... } *)
+  | Var_decl bindings PVirgule { Var_decl $2 } (* var bs; *)
+  | If Lpar expr Rpar instr { If ($3, $5) } (* if (e) i *)
+  | If Lpar expr Rpar instr Else instr { If_else ($3, $5, $7) } (* if (e) i1 else i2 *)
   | While Lpar expr Rpar instr { While ($3, $5) } (* while (e) i *)
   | Return PVirgule { Return None } (* return; *)
   | Return expr PVirgule { Return (Some $2) } (* return e; *)

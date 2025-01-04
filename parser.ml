@@ -585,21 +585,21 @@ let yyact = [|
     let _1 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
 # 62 "parser.mly"
-                  ( Expr (_1) )
+                  ( Pt_virgule (_1) )
 # 590 "parser.ml"
                : 'instr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : 'decl_instr_list) in
     Obj.repr(
 # 63 "parser.mly"
-                              ( Block _2 )
+                              ( Bloc _2 )
 # 597 "parser.ml"
                : 'instr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : 'bindings) in
     Obj.repr(
 # 64 "parser.mly"
-                               ( VarDecl _2 )
+                               ( Var_decl _2 )
 # 604 "parser.ml"
                : 'instr))
 ; (fun __caml_parser_env ->
@@ -607,7 +607,7 @@ let yyact = [|
     let _5 = (Parsing.peek_val __caml_parser_env 0 : 'instr) in
     Obj.repr(
 # 65 "parser.mly"
-                            ( If (_3, _5, Nil) )
+                            ( If (_3, _5) )
 # 612 "parser.ml"
                : 'instr))
 ; (fun __caml_parser_env ->
@@ -616,7 +616,7 @@ let yyact = [|
     let _7 = (Parsing.peek_val __caml_parser_env 0 : 'instr) in
     Obj.repr(
 # 66 "parser.mly"
-                                       ( If (_3, _5, _7) )
+                                       ( If_else (_3, _5, _7) )
 # 621 "parser.ml"
                : 'instr))
 ; (fun __caml_parser_env ->
