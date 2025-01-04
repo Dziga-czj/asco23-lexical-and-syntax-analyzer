@@ -61,6 +61,7 @@ obj_list :
     | Id DPoints expr Virgule obj_list { ($1, $3) :: $5 }
 
 instr : 
+    | PVirgule { Vide }
     | Var_decl Id Eq expr { Affect (Id $2, $4) }
     | Const Id Eq expr { Affect (Id $2, $4) }
     | Let Id Eq expr { Affect (Id $2, $4) }
