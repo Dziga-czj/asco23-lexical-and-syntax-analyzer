@@ -98,8 +98,6 @@ obj_list :
   | Id DPoints expr { [($1, $3)] } 
   | Id DPoints expr Virgule obj_list { ($1, $3) :: $5 } 
 
-
-
 binding :
   | Id { Binding ($1, None, None) } (* i *)
   | Id DPoints type_expr { Binding ($1, Some $3, None) } (* i : t *)
