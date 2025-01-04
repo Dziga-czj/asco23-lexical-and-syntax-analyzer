@@ -23,7 +23,7 @@
 (* Entrée principale du programme *)
 
 s : 
-  | decl_instr_list EOL { ast $1 } (* prend une liste de déclarations ou instructions *)
+  | decl_instr_list EOL { $1 } (* prend une liste de déclarations ou instructions *)
 
 (* Déclarations et instructions *)
 
@@ -39,8 +39,8 @@ decl_instr_list :
 
 decl :
   | Type Id Eq type_expr PVirgule { TypeAlias ($2, $4) } 
-  | Let bindings PVirgule { LetDecl $2 } 
-  | Const bindings PVirgule { ConstDecl $2 } 
+  | Let bindings PVirgule { Let_decl $2 } 
+  | Const bindings PVirgule { Const_decl $2 } 
   | Function Id Lpar param_list Rpar return_type LAcc decl_instr_list RAcc { 
       FuncDecl ($2, $4, $6, $8) 
     } (* function i(as) to { dis } voir énoncé *)
