@@ -61,8 +61,7 @@ and instr =
   | Pt_virgule of expr
   | Bloc of inst_or_decl list
   | Var_decl of binding list
-  | If of expr * instr
-  | If_else of expr * instr * instr
+  | If of expr * instr * instr option
   | While of expr * instr
   | Return of expr option
 
@@ -96,27 +95,13 @@ let rec print_sep_spec = function
 
 
 let rec aff_aux a =
-  (*
   match a with
-  | Group(a1) -> 
-    print_string "(";
-    aff_aux a1;
-    print_string ")";
-  | Plus(a1, a2) ->
-    aff_aux a1;
-    print_string "+";
-    aff_aux a2;
-  | Times(a1, a2) ->
-    aff_aux a1;
-    print_string "*";
-    aff_aux a2;
-  | Cst_int i -> Printf.printf "Cst(%i)" i
-  | Cst_bool i -> if i then Printf.printf "Cst_bool(true)" else Printf.printf "Cst_bool(false)"
-  | Cst_float i -> Printf.printf "Cst_float(%f)" i
-  | Cst_string s -> print_string s; print_newline ();
-  | Id s -> Printf.printf "Id(%s)" s
-    *)
-    failwith "TODO avec le nouvel arbre ou un type partiel pour tester"
+  | [] -> ()
+  | t::q -> match t with
+            | I_or_D_instr i -> Printf.printf "decalaration\n"; 
+            | I_or_D_decl d -> Printf.printf "instruction\n";
+
+  ()
 let affiche = aff_aux
     
   

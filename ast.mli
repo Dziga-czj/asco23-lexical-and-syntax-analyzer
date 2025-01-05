@@ -61,8 +61,7 @@ and instr =
   | Pt_virgule of expr
   | Bloc of inst_or_decl list
   | Var_decl of binding list
-  | If of expr * instr
-  | If_else of expr * instr * instr
+  | If of expr * instr * instr option
   | While of expr * instr
   | Return of expr option
 

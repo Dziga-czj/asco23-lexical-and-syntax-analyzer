@@ -1,1 +1,2 @@
-(sdf*(sdf*8)*sf)
+var a = 1;
+var b = 2;

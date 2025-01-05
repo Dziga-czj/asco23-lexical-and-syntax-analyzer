@@ -6,14 +6,16 @@
 }
 
 rule decoupe = parse
-| "//"*'\n' { Comment }
-| "/*"*"*\\" { Comment }
+| "//" [^'\n']* '\n' { EOL } 
+| "/*" ( [^'*'] | ('*' [^'/']) )* "*/" { decoupe lexbuf }
+| [' ' '\t' '\r' '\n'] { EOL } 
 | '+' { Plus }
 | '*' { Times }
 | '(' { Lpar }
 | ')' { Rpar }
 | '\n' { EOL }
-| eof { EOL }
+| '\r' { EOL }
+| eof { EOF }
 | "typeof" { Typeof }
 | "**" { Exp }
 | '/' { Div }
@@ -78,7 +80,7 @@ rule decoupe = parse
 
 | '"'([^'"']|"\\\"")*'"' as s { Cst_string (String.sub s 1 (String.length s -2)) }
 | "'"([^''']|"\\'")*"'" as s { Cst_string (String.sub s 1 (String.length s -2)) }
-
+| _ as c { failwith ("Unexpected character: " ^ Char.escaped c) }
 {
     (*trailer*)
 }

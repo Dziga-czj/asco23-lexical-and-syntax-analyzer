@@ -2,12 +2,13 @@
     open Ast
 %}
 
-%token Plus Times Lpar Rpar Point EOL Comment Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints Var_decl If Else While Return Type Let Const Function
+%token Plus EOF Times Lpar Rpar Point EOL Comment Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints Var_decl If Else While Return Type Let Const Function
 %token <int> Cst_int
 %token <float> Cst_float
 %token <bool> Cst_bool
 %token <string> Cst_string
 %token <string> Id
+%token Comment
 
 %left Or
 %left And
@@ -18,6 +19,7 @@
 %right Point
 %left LBracket DPoints 
 %left Lpar
+%nonassoc ELSE If
 %nonassoc Eq Double_eq Diff Double_diff Triple_eq Comp_lt Comp_le Comp_gt Comp_ge
 
 %start s
@@ -25,8 +27,7 @@
 %%
 (* Entrée principale du programme *)
 
-s : 
-  | decl_instr_list EOL { $1 } (* prend une liste de déclarations ou instructions *)
+s : decl_instr_list EOF { $1 } (* prend une liste de déclarations ou instructions *)
 
 (* Déclarations et instructions *)
 
@@ -36,11 +37,14 @@ decl_instr :
 
 decl_instr_list :
   | { [] }
+  | EOL { [] }
   | decl_instr decl_instr_list2 { $1::$2 }
 
 decl_instr_list2 :
   | { [] } (* une seule déclaration ou instruction *)
-  | PVirgule decl_instr_list { $2 } (* plusieurs decl/instr séparées par des ; *)
+  | EOL { [] }
+  | PVirgule decl_instr_list { $2 }
+  | PVirgule EOL decl_instr_list { $3 } (* plusieurs decl/instr séparées par des ; *)
 
 return_type :
     |   { None } 
@@ -50,23 +54,29 @@ decl :
   | Type Id Eq type_expr PVirgule { Type_alias (Id $2, $4) }
   | Let bindings PVirgule { Let_decl $2 }
   | Const bindings PVirgule { Const_decl $2 }
-  | Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc { 
-    Func_decl (Id($2), $4, $6, $8) 
-}
+  | Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc { Func_decl (Id($2), $4, $6, $8) }
 
 
 (* Instructions *)
+instr:
+  | instr_mached { $1 }
+  | instr_non_mached { $1 }
 
-instr :
+
+instr_mached :
   | PVirgule { Empty } (* ; *)
   | expr PVirgule { Pt_virgule ($1) } (* e; *)
   | LAcc decl_instr_list RAcc { Bloc $2 } (* { ... } *)
   | Var_decl bindings PVirgule { Var_decl $2 } (* var bs; *)
-  | If Lpar expr Rpar instr { If ($3, $5) } (* if (e) i *)
-  | If Lpar expr Rpar instr Else instr { If_else ($3, $5, $7) } (* if (e) i1 else i2 *)
-  | While Lpar expr Rpar instr { While ($3, $5) } (* while (e) i *)
+  | If Lpar expr Rpar instr_mached Else instr_mached { If ($3, $5, None)  } (* if (e) i *)
+  | While Lpar expr Rpar instr_mached { While ($3, $5) } (* while (e) i *)
   | Return PVirgule { Return None } (* return; *)
   | Return expr PVirgule { Return (Some $2) } (* return e; *)
+
+instr_non_mached :
+  | If Lpar expr Rpar instr { If ($3, $5, None) } (* if (e) i else i *)
+  | If Lpar expr Rpar instr_mached Else instr_non_mached { If ($3, $5, Some $7) } (* if (e) i else i *)
+
 
 (* Expressions *)
 

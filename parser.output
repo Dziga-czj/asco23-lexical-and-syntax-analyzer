@@ -1,89 +1,97 @@
    0  $accept : %entry% $end
 
-   1  s : decl_instr_list EOL
+   1  s : decl_instr_list EOF
 
    2  decl_instr : decl
    3             | instr
 
    4  decl_instr_list :
-   5                  | decl_instr decl_instr_list2
+   5                  | EOL
+   6                  | decl_instr decl_instr_list2
 
-   6  decl_instr_list2 :
-   7                   | PVirgule decl_instr_list
+   7  decl_instr_list2 :
+   8                   | EOL
+   9                   | PVirgule decl_instr_list
+  10                   | PVirgule EOL decl_instr_list
 
-   8  return_type :
-   9              | DPoints type_expr
+  11  return_type :
+  12              | DPoints type_expr
 
-  10  decl : Type Id Eq type_expr PVirgule
-  11       | Let bindings PVirgule
-  12       | Const bindings PVirgule
-  13       | Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc
+  13  decl : Type Id Eq type_expr PVirgule
+  14       | Let bindings PVirgule
+  15       | Const bindings PVirgule
+  16       | Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc
 
-  14  instr : PVirgule
-  15        | expr PVirgule
-  16        | LAcc decl_instr_list RAcc
-  17        | Var_decl bindings PVirgule
-  18        | If Lpar expr Rpar instr
-  19        | If Lpar expr Rpar instr Else instr
-  20        | While Lpar expr Rpar instr
-  21        | Return PVirgule
-  22        | Return expr PVirgule
+  17  instr : instr_mached
+  18        | instr_non_mached
 
-  23  expr : Cst_int
-  24       | Cst_float
-  25       | Cst_bool
-  26       | Cst_string
-  27       | Lpar expr Rpar
-  28       | Typeof expr
-  29       | Minus expr
-  30       | Plus expr
-  31       | LBracket expr_list RBracket
-  32       | LAcc obj_list RAcc
-  33       | left_mem
-  34       | expr Plus expr
-  35       | expr Minus expr
-  36       | expr Times expr
-  37       | expr Div expr
-  38       | expr Exp expr
-  39       | expr Comp_lt expr
-  40       | expr Comp_le expr
-  41       | expr Comp_gt expr
-  42       | expr Comp_ge expr
-  43       | expr Double_eq expr
-  44       | expr Diff expr
-  45       | expr Triple_eq expr
-  46       | expr Double_diff expr
-  47       | expr And expr
-  48       | expr Or expr
-  49       | expr Lpar expr_list Rpar
-  50       | left_mem Eq expr
+  19  instr_mached : PVirgule
+  20               | expr PVirgule
+  21               | LAcc decl_instr_list RAcc
+  22               | Var_decl bindings PVirgule
+  23               | If Lpar expr Rpar instr_mached Else instr_mached
+  24               | While Lpar expr Rpar instr_mached
+  25               | Return PVirgule
+  26               | Return expr PVirgule
 
-  51  expr_list :
-  52            | expr expr_list_2
+  27  instr_non_mached : If Lpar expr Rpar instr
+  28                   | If Lpar expr Rpar instr_mached Else instr_non_mached
 
-  53  expr_list_2 :
-  54              | Virgule expr_list
+  29  expr : Cst_int
+  30       | Cst_float
+  31       | Cst_bool
+  32       | Cst_string
+  33       | Lpar expr Rpar
+  34       | Typeof expr
+  35       | Minus expr
+  36       | Plus expr
+  37       | LBracket expr_list RBracket
+  38       | LAcc obj_list RAcc
+  39       | left_mem
+  40       | expr Plus expr
+  41       | expr Minus expr
+  42       | expr Times expr
+  43       | expr Div expr
+  44       | expr Exp expr
+  45       | expr Comp_lt expr
+  46       | expr Comp_le expr
+  47       | expr Comp_gt expr
+  48       | expr Comp_ge expr
+  49       | expr Double_eq expr
+  50       | expr Diff expr
+  51       | expr Triple_eq expr
+  52       | expr Double_diff expr
+  53       | expr And expr
+  54       | expr Or expr
+  55       | expr Lpar expr_list Rpar
+  56       | left_mem Eq expr
 
-  55  obj_list : Id DPoints expr
-  56           | Id DPoints expr Virgule obj_list
+  57  expr_list :
+  58            | expr expr_list_2
 
-  57  binding : Id
-  58          | Id DPoints type_expr
-  59          | Id Eq expr
-  60          | Id DPoints type_expr Eq expr
+  59  expr_list_2 :
+  60              | Virgule expr_list
 
-  61  bindings : binding
-  62           | binding Virgule bindings
+  61  obj_list : Id DPoints expr
+  62           | Id DPoints expr Virgule obj_list
 
-  63  left_mem : Id
-  64           | expr LBracket expr RBracket
-  65           | expr Point Id
+  63  binding : Id
+  64          | Id DPoints type_expr
+  65          | Id Eq expr
+  66          | Id DPoints type_expr Eq expr
 
-  66  type_expr : Type_num
-  67            | Type_bool
-  68            | Type_string
+  67  bindings : binding
+  68           | binding Virgule bindings
 
-  69  %entry% : '\001' s
+  69  left_mem : Id
+  70           | expr LBracket expr RBracket
+  71           | expr Point Id
+
+  72  type_expr : Type_num
+  73            | Type_bool
+  74            | Type_string
+
+  75  %entry% : '\001' s
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -95,38 +103,41 @@ state 0
 
 
 state 1
-	%entry% : '\001' . s  (69)
+	%entry% : '\001' . s  (75)
 	decl_instr_list : .  (4)
 
 	Plus  shift 3
 	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Type  shift 13
-	Let  shift 14
-	Const  shift 15
-	Function  shift 16
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	EOL  reduce 4
+	EOL  shift 5
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Type  shift 14
+	Let  shift 15
+	Const  shift 16
+	Function  shift 17
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	EOF  reduce 4
 
-	s  goto 23
-	decl_instr_list  goto 24
-	decl_instr  goto 25
-	decl  goto 26
-	instr  goto 27
-	expr  goto 28
-	left_mem  goto 29
+	s  goto 24
+	decl_instr_list  goto 25
+	decl_instr  goto 26
+	decl  goto 27
+	instr  goto 28
+	instr_mached  goto 29
+	instr_non_mached  goto 30
+	expr  goto 31
+	left_mem  goto 32
 
 
 state 2
@@ -136,1521 +147,525 @@ state 2
 
 
 state 3
-	expr : Plus . expr  (30)
+	expr : Plus . expr  (36)
 
 	Plus  shift 3
 	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
 	.  error
 
-	expr  goto 31
-	left_mem  goto 29
+	expr  goto 34
+	left_mem  goto 32
 
 
 state 4
-	expr : Lpar . expr Rpar  (27)
+	expr : Lpar . expr Rpar  (33)
 
 	Plus  shift 3
 	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
 	.  error
 
-	expr  goto 32
-	left_mem  goto 29
+	expr  goto 35
+	left_mem  goto 32
 
 
 state 5
-	expr : Typeof . expr  (28)
+	decl_instr_list : EOL .  (5)
 
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 33
-	left_mem  goto 29
+	.  reduce 5
 
 
 state 6
-	expr : LBracket . expr_list RBracket  (31)
-	expr_list : .  (51)
+	expr : Typeof . expr  (34)
 
 	Plus  shift 3
 	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	RBracket  reduce 51
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
 
-	expr  goto 34
-	expr_list  goto 35
-	left_mem  goto 29
+	expr  goto 36
+	left_mem  goto 32
 
 
 state 7
-	instr : LAcc . decl_instr_list RAcc  (16)
-	expr : LAcc . obj_list RAcc  (32)
+	expr : LBracket . expr_list RBracket  (37)
+	expr_list : .  (57)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	RBracket  reduce 57
+
+	expr  goto 37
+	expr_list  goto 38
+	left_mem  goto 32
+
+
+state 8
+	instr_mached : LAcc . decl_instr_list RAcc  (21)
+	expr : LAcc . obj_list RAcc  (38)
 	decl_instr_list : .  (4)
 
 	Plus  shift 3
 	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Type  shift 13
-	Let  shift 14
-	Const  shift 15
-	Function  shift 16
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 36
-	Minus  shift 22
+	EOL  shift 5
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Type  shift 14
+	Let  shift 15
+	Const  shift 16
+	Function  shift 17
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 39
+	Minus  shift 23
 	RAcc  reduce 4
 
-	decl_instr_list  goto 37
-	decl_instr  goto 25
-	decl  goto 26
-	instr  goto 27
-	expr  goto 28
-	obj_list  goto 38
-	left_mem  goto 29
-
-
-state 8
-	instr : PVirgule .  (14)
-
-	.  reduce 14
+	decl_instr_list  goto 40
+	decl_instr  goto 26
+	decl  goto 27
+	instr  goto 28
+	instr_mached  goto 29
+	instr_non_mached  goto 30
+	expr  goto 31
+	obj_list  goto 41
+	left_mem  goto 32
 
 
 state 9
-	instr : Var_decl . bindings PVirgule  (17)
+	instr_mached : PVirgule .  (19)
 
-	Id  shift 39
-	.  error
-
-	bindings  goto 40
-	binding  goto 41
+	.  reduce 19
 
 
 state 10
-	instr : If . Lpar expr Rpar instr  (18)
-	instr : If . Lpar expr Rpar instr Else instr  (19)
+	instr_mached : Var_decl . bindings PVirgule  (22)
 
-	Lpar  shift 42
+	Id  shift 42
 	.  error
+
+	bindings  goto 43
+	binding  goto 44
 
 
 state 11
-	instr : While . Lpar expr Rpar instr  (20)
+	instr_mached : If . Lpar expr Rpar instr_mached Else instr_mached  (23)
+	instr_non_mached : If . Lpar expr Rpar instr  (27)
+	instr_non_mached : If . Lpar expr Rpar instr_mached Else instr_non_mached  (28)
 
-	Lpar  shift 43
+	Lpar  shift 45
 	.  error
 
 
 state 12
-	instr : Return . PVirgule  (21)
-	instr : Return . expr PVirgule  (22)
+	instr_mached : While . Lpar expr Rpar instr_mached  (24)
 
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	PVirgule  shift 44
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
+	Lpar  shift 46
 	.  error
-
-	expr  goto 45
-	left_mem  goto 29
 
 
 state 13
-	decl : Type . Id Eq type_expr PVirgule  (10)
+	instr_mached : Return . PVirgule  (25)
+	instr_mached : Return . expr PVirgule  (26)
 
-	Id  shift 46
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	PVirgule  shift 47
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
 	.  error
+
+	expr  goto 48
+	left_mem  goto 32
 
 
 state 14
-	decl : Let . bindings PVirgule  (11)
-
-	Id  shift 39
-	.  error
-
-	bindings  goto 47
-	binding  goto 41
-
-
-state 15
-	decl : Const . bindings PVirgule  (12)
-
-	Id  shift 39
-	.  error
-
-	bindings  goto 48
-	binding  goto 41
-
-
-state 16
-	decl : Function . Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc  (13)
+	decl : Type . Id Eq type_expr PVirgule  (13)
 
 	Id  shift 49
 	.  error
 
 
-state 17
-	expr : Cst_int .  (23)
+state 15
+	decl : Let . bindings PVirgule  (14)
 
-	.  reduce 23
+	Id  shift 42
+	.  error
+
+	bindings  goto 50
+	binding  goto 44
+
+
+state 16
+	decl : Const . bindings PVirgule  (15)
+
+	Id  shift 42
+	.  error
+
+	bindings  goto 51
+	binding  goto 44
+
+
+state 17
+	decl : Function . Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc  (16)
+
+	Id  shift 52
+	.  error
 
 
 state 18
-	expr : Cst_float .  (24)
+	expr : Cst_int .  (29)
 
-	.  reduce 24
+	.  reduce 29
 
 
 state 19
-	expr : Cst_bool .  (25)
+	expr : Cst_float .  (30)
 
-	.  reduce 25
+	.  reduce 30
 
 
 state 20
-	expr : Cst_string .  (26)
+	expr : Cst_bool .  (31)
 
-	.  reduce 26
+	.  reduce 31
 
 
 state 21
-	left_mem : Id .  (63)
+	expr : Cst_string .  (32)
 
-	.  reduce 63
+	.  reduce 32
 
 
 state 22
-	expr : Minus . expr  (29)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 50
-	left_mem  goto 29
-
-
-state 23
-	%entry% : '\001' s .  (69)
+	left_mem : Id .  (69)
 
 	.  reduce 69
 
 
-state 24
-	s : decl_instr_list . EOL  (1)
+state 23
+	expr : Minus . expr  (35)
 
-	EOL  shift 51
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
 	.  error
+
+	expr  goto 53
+	left_mem  goto 32
+
+
+state 24
+	%entry% : '\001' s .  (75)
+
+	.  reduce 75
 
 
 state 25
-	decl_instr_list : decl_instr . decl_instr_list2  (5)
-	decl_instr_list2 : .  (6)
+	s : decl_instr_list . EOF  (1)
 
-	PVirgule  shift 52
-	EOL  reduce 6
-	RAcc  reduce 6
-
-	decl_instr_list2  goto 53
+	EOF  shift 54
+	.  error
 
 
 state 26
+	decl_instr_list : decl_instr . decl_instr_list2  (6)
+	decl_instr_list2 : .  (7)
+
+	EOL  shift 55
+	PVirgule  shift 56
+	EOF  reduce 7
+	RAcc  reduce 7
+
+	decl_instr_list2  goto 57
+
+
+state 27
 	decl_instr : decl .  (2)
 
 	.  reduce 2
 
 
-state 27
+state 28
 	decl_instr : instr .  (3)
 
 	.  reduce 3
 
 
-state 28
-	instr : expr . PVirgule  (15)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	PVirgule  shift 71
-	Minus  shift 72
-	.  error
-
-
 state 29
-	expr : left_mem .  (33)
-	expr : left_mem . Eq expr  (50)
-
-	Eq  shift 73
-	Plus  reduce 33
-	Times  reduce 33
-	Lpar  reduce 33
-	Rpar  reduce 33
-	Point  reduce 33
-	Exp  reduce 33
-	Div  reduce 33
-	Comp_lt  reduce 33
-	Comp_le  reduce 33
-	Comp_gt  reduce 33
-	Comp_ge  reduce 33
-	Double_eq  reduce 33
-	Triple_eq  reduce 33
-	Diff  reduce 33
-	Double_diff  reduce 33
-	And  reduce 33
-	Or  reduce 33
-	LBracket  reduce 33
-	RBracket  reduce 33
-	RAcc  reduce 33
-	PVirgule  reduce 33
-	Virgule  reduce 33
-	Minus  reduce 33
-
-
-state 30
-	expr : LAcc . obj_list RAcc  (32)
-
-	Id  shift 74
-	.  error
-
-	obj_list  goto 38
-
-
-state 31
-	expr : Plus expr .  (30)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Plus  reduce 30
-	Rpar  reduce 30
-	And  reduce 30
-	Or  reduce 30
-	RBracket  reduce 30
-	RAcc  reduce 30
-	PVirgule  reduce 30
-	Virgule  reduce 30
-	Minus  reduce 30
-
-
-state 32
-	expr : Lpar expr . Rpar  (27)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Rpar  shift 75
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Minus  shift 72
-	.  error
-
-
-state 33
-	expr : Typeof expr .  (28)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Plus  reduce 28
-	Rpar  reduce 28
-	And  reduce 28
-	Or  reduce 28
-	RBracket  reduce 28
-	RAcc  reduce 28
-	PVirgule  reduce 28
-	Virgule  reduce 28
-	Minus  reduce 28
-
-
-state 34
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	expr_list : expr . expr_list_2  (52)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-	expr_list_2 : .  (53)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Virgule  shift 76
-	Minus  shift 72
-	Rpar  reduce 53
-	RBracket  reduce 53
-
-	expr_list_2  goto 77
-
-
-state 35
-	expr : LBracket expr_list . RBracket  (31)
-
-	RBracket  shift 78
-	.  error
-
-
-state 36
-	obj_list : Id . DPoints expr  (55)
-	obj_list : Id . DPoints expr Virgule obj_list  (56)
-	left_mem : Id .  (63)
-
-	DPoints  shift 79
-	Plus  reduce 63
-	Times  reduce 63
-	Lpar  reduce 63
-	Point  reduce 63
-	Exp  reduce 63
-	Div  reduce 63
-	Comp_lt  reduce 63
-	Comp_le  reduce 63
-	Comp_gt  reduce 63
-	Comp_ge  reduce 63
-	Eq  reduce 63
-	Double_eq  reduce 63
-	Triple_eq  reduce 63
-	Diff  reduce 63
-	Double_diff  reduce 63
-	And  reduce 63
-	Or  reduce 63
-	LBracket  reduce 63
-	PVirgule  reduce 63
-	Minus  reduce 63
-
-
-state 37
-	instr : LAcc decl_instr_list . RAcc  (16)
-
-	RAcc  shift 80
-	.  error
-
-
-state 38
-	expr : LAcc obj_list . RAcc  (32)
-
-	RAcc  shift 81
-	.  error
-
-
-state 39
-	binding : Id .  (57)
-	binding : Id . DPoints type_expr  (58)
-	binding : Id . Eq expr  (59)
-	binding : Id . DPoints type_expr Eq expr  (60)
-
-	Eq  shift 82
-	DPoints  shift 83
-	Rpar  reduce 57
-	PVirgule  reduce 57
-	Virgule  reduce 57
-
-
-state 40
-	instr : Var_decl bindings . PVirgule  (17)
-
-	PVirgule  shift 84
-	.  error
-
-
-state 41
-	bindings : binding .  (61)
-	bindings : binding . Virgule bindings  (62)
-
-	Virgule  shift 85
-	Rpar  reduce 61
-	PVirgule  reduce 61
-
-
-state 42
-	instr : If Lpar . expr Rpar instr  (18)
-	instr : If Lpar . expr Rpar instr Else instr  (19)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 86
-	left_mem  goto 29
-
-
-state 43
-	instr : While Lpar . expr Rpar instr  (20)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 87
-	left_mem  goto 29
-
-
-state 44
-	instr : Return PVirgule .  (21)
-
-	.  reduce 21
-
-
-state 45
-	instr : Return expr . PVirgule  (22)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	PVirgule  shift 88
-	Minus  shift 72
-	.  error
-
-
-state 46
-	decl : Type Id . Eq type_expr PVirgule  (10)
-
-	Eq  shift 89
-	.  error
-
-
-state 47
-	decl : Let bindings . PVirgule  (11)
-
-	PVirgule  shift 90
-	.  error
-
-
-state 48
-	decl : Const bindings . PVirgule  (12)
-
-	PVirgule  shift 91
-	.  error
-
-
-state 49
-	decl : Function Id . Lpar bindings Rpar return_type LAcc decl_instr_list RAcc  (13)
-
-	Lpar  shift 92
-	.  error
-
-
-state 50
-	expr : Minus expr .  (29)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Plus  reduce 29
-	Rpar  reduce 29
-	And  reduce 29
-	Or  reduce 29
-	RBracket  reduce 29
-	RAcc  reduce 29
-	PVirgule  reduce 29
-	Virgule  reduce 29
-	Minus  reduce 29
-
-
-state 51
-	s : decl_instr_list EOL .  (1)
-
-	.  reduce 1
-
-
-state 52
-	decl_instr_list2 : PVirgule . decl_instr_list  (7)
-	decl_instr_list : .  (4)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Type  shift 13
-	Let  shift 14
-	Const  shift 15
-	Function  shift 16
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	EOL  reduce 4
-	RAcc  reduce 4
-
-	decl_instr_list  goto 93
-	decl_instr  goto 25
-	decl  goto 26
-	instr  goto 27
-	expr  goto 28
-	left_mem  goto 29
-
-
-state 53
-	decl_instr_list : decl_instr decl_instr_list2 .  (5)
-
-	.  reduce 5
-
-
-state 54
-	expr : expr Plus . expr  (34)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 94
-	left_mem  goto 29
-
-
-state 55
-	expr : expr Times . expr  (36)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 95
-	left_mem  goto 29
-
-
-state 56
-	expr : expr Lpar . expr_list Rpar  (49)
-	expr_list : .  (51)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	Rpar  reduce 51
-
-	expr  goto 34
-	expr_list  goto 96
-	left_mem  goto 29
-
-
-state 57
-	left_mem : expr Point . Id  (65)
-
-	Id  shift 97
-	.  error
-
-
-state 58
-	expr : expr Exp . expr  (38)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 98
-	left_mem  goto 29
-
-
-state 59
-	expr : expr Div . expr  (37)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 99
-	left_mem  goto 29
-
-
-state 60
-	expr : expr Comp_lt . expr  (39)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 100
-	left_mem  goto 29
-
-
-state 61
-	expr : expr Comp_le . expr  (40)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 101
-	left_mem  goto 29
-
-
-state 62
-	expr : expr Comp_gt . expr  (41)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 102
-	left_mem  goto 29
-
-
-state 63
-	expr : expr Comp_ge . expr  (42)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 103
-	left_mem  goto 29
-
-
-state 64
-	expr : expr Double_eq . expr  (43)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 104
-	left_mem  goto 29
-
-
-state 65
-	expr : expr Triple_eq . expr  (45)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 105
-	left_mem  goto 29
-
-
-state 66
-	expr : expr Diff . expr  (44)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 106
-	left_mem  goto 29
-
-
-state 67
-	expr : expr Double_diff . expr  (46)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 107
-	left_mem  goto 29
-
-
-state 68
-	expr : expr And . expr  (47)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 108
-	left_mem  goto 29
-
-
-state 69
-	expr : expr Or . expr  (48)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 109
-	left_mem  goto 29
-
-
-state 70
-	left_mem : expr LBracket . expr RBracket  (64)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 110
-	left_mem  goto 29
-
-
-state 71
-	instr : expr PVirgule .  (15)
-
-	.  reduce 15
-
-
-state 72
-	expr : expr Minus . expr  (35)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 111
-	left_mem  goto 29
-
-
-state 73
-	expr : left_mem Eq . expr  (50)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 112
-	left_mem  goto 29
-
-
-state 74
-	obj_list : Id . DPoints expr  (55)
-	obj_list : Id . DPoints expr Virgule obj_list  (56)
-
-	DPoints  shift 79
-	.  error
-
-
-state 75
-	expr : Lpar expr Rpar .  (27)
-
-	.  reduce 27
-
-
-state 76
-	expr_list_2 : Virgule . expr_list  (54)
-	expr_list : .  (51)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	Rpar  reduce 51
-	RBracket  reduce 51
-
-	expr  goto 34
-	expr_list  goto 113
-	left_mem  goto 29
-
-
-state 77
-	expr_list : expr expr_list_2 .  (52)
-
-	.  reduce 52
-
-
-state 78
-	expr : LBracket expr_list RBracket .  (31)
-
-	.  reduce 31
-
-
-state 79
-	obj_list : Id DPoints . expr  (55)
-	obj_list : Id DPoints . expr Virgule obj_list  (56)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 114
-	left_mem  goto 29
-
-
-state 80
-	instr : LAcc decl_instr_list RAcc .  (16)
-
-	.  reduce 16
-
-
-state 81
-	expr : LAcc obj_list RAcc .  (32)
-
-	.  reduce 32
-
-
-state 82
-	binding : Id Eq . expr  (59)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 115
-	left_mem  goto 29
-
-
-state 83
-	binding : Id DPoints . type_expr  (58)
-	binding : Id DPoints . type_expr Eq expr  (60)
-
-	Type_num  shift 116
-	Type_bool  shift 117
-	Type_string  shift 118
-	.  error
-
-	type_expr  goto 119
-
-
-state 84
-	instr : Var_decl bindings PVirgule .  (17)
+	instr : instr_mached .  (17)
 
 	.  reduce 17
 
 
-state 85
-	bindings : binding Virgule . bindings  (62)
+state 30
+	instr : instr_non_mached .  (18)
 
-	Id  shift 39
-	.  error
-
-	bindings  goto 120
-	binding  goto 41
+	.  reduce 18
 
 
-state 86
-	instr : If Lpar expr . Rpar instr  (18)
-	instr : If Lpar expr . Rpar instr Else instr  (19)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
+state 31
+	instr_mached : expr . PVirgule  (20)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
 
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Rpar  shift 121
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Minus  shift 72
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	PVirgule  shift 75
+	Minus  shift 76
 	.  error
 
 
-state 87
-	instr : While Lpar expr . Rpar instr  (20)
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
+state 32
+	expr : left_mem .  (39)
+	expr : left_mem . Eq expr  (56)
 
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Rpar  shift 122
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Minus  shift 72
+	Eq  shift 77
+	Plus  reduce 39
+	Times  reduce 39
+	Lpar  reduce 39
+	Rpar  reduce 39
+	Point  reduce 39
+	Exp  reduce 39
+	Div  reduce 39
+	Comp_lt  reduce 39
+	Comp_le  reduce 39
+	Comp_gt  reduce 39
+	Comp_ge  reduce 39
+	Double_eq  reduce 39
+	Triple_eq  reduce 39
+	Diff  reduce 39
+	Double_diff  reduce 39
+	And  reduce 39
+	Or  reduce 39
+	LBracket  reduce 39
+	RBracket  reduce 39
+	RAcc  reduce 39
+	PVirgule  reduce 39
+	Virgule  reduce 39
+	Minus  reduce 39
+
+
+state 33
+	expr : LAcc . obj_list RAcc  (38)
+
+	Id  shift 78
+	.  error
+
+	obj_list  goto 41
+
+
+state 34
+	expr : Plus expr .  (36)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Plus  reduce 36
+	Rpar  reduce 36
+	And  reduce 36
+	Or  reduce 36
+	RBracket  reduce 36
+	RAcc  reduce 36
+	PVirgule  reduce 36
+	Virgule  reduce 36
+	Minus  reduce 36
+
+
+state 35
+	expr : Lpar expr . Rpar  (33)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Rpar  shift 79
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Minus  shift 76
 	.  error
 
 
-state 88
-	instr : Return expr PVirgule .  (22)
+state 36
+	expr : Typeof expr .  (34)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
 
-	.  reduce 22
-
-
-state 89
-	decl : Type Id Eq . type_expr PVirgule  (10)
-
-	Type_num  shift 116
-	Type_bool  shift 117
-	Type_string  shift 118
-	.  error
-
-	type_expr  goto 123
-
-
-state 90
-	decl : Let bindings PVirgule .  (11)
-
-	.  reduce 11
-
-
-state 91
-	decl : Const bindings PVirgule .  (12)
-
-	.  reduce 12
-
-
-state 92
-	decl : Function Id Lpar . bindings Rpar return_type LAcc decl_instr_list RAcc  (13)
-
-	Id  shift 39
-	.  error
-
-	bindings  goto 124
-	binding  goto 41
-
-
-state 93
-	decl_instr_list2 : PVirgule decl_instr_list .  (7)
-
-	.  reduce 7
-
-
-state 94
-	expr : expr . Plus expr  (34)
-	expr : expr Plus expr .  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
 	Plus  reduce 34
 	Rpar  reduce 34
 	And  reduce 34
@@ -1662,519 +677,285 @@ state 94
 	Minus  reduce 34
 
 
-state 95
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr Times expr .  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
+state 37
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	expr_list : expr . expr_list_2  (58)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+	expr_list_2 : .  (59)
 
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Plus  reduce 36
-	Times  reduce 36
-	Rpar  reduce 36
-	Div  reduce 36
-	And  reduce 36
-	Or  reduce 36
-	RBracket  reduce 36
-	RAcc  reduce 36
-	PVirgule  reduce 36
-	Virgule  reduce 36
-	Minus  reduce 36
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Virgule  shift 80
+	Minus  shift 76
+	Rpar  reduce 59
+	RBracket  reduce 59
+
+	expr_list_2  goto 81
 
 
-state 96
-	expr : expr Lpar expr_list . Rpar  (49)
+state 38
+	expr : LBracket expr_list . RBracket  (37)
 
-	Rpar  shift 125
+	RBracket  shift 82
 	.  error
 
 
-state 97
-	left_mem : expr Point Id .  (65)
+state 39
+	obj_list : Id . DPoints expr  (61)
+	obj_list : Id . DPoints expr Virgule obj_list  (62)
+	left_mem : Id .  (69)
 
-	.  reduce 65
-
-
-state 98
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr Exp expr .  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Plus  reduce 38
-	Times  reduce 38
-	Rpar  reduce 38
-	Div  reduce 38
-	And  reduce 38
-	Or  reduce 38
-	RBracket  reduce 38
-	RAcc  reduce 38
-	PVirgule  reduce 38
-	Virgule  reduce 38
-	Minus  reduce 38
+	DPoints  shift 83
+	Plus  reduce 69
+	Times  reduce 69
+	Lpar  reduce 69
+	Point  reduce 69
+	Exp  reduce 69
+	Div  reduce 69
+	Comp_lt  reduce 69
+	Comp_le  reduce 69
+	Comp_gt  reduce 69
+	Comp_ge  reduce 69
+	Eq  reduce 69
+	Double_eq  reduce 69
+	Triple_eq  reduce 69
+	Diff  reduce 69
+	Double_diff  reduce 69
+	And  reduce 69
+	Or  reduce 69
+	LBracket  reduce 69
+	PVirgule  reduce 69
+	Minus  reduce 69
 
 
-state 99
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr Div expr .  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
+state 40
+	instr_mached : LAcc decl_instr_list . RAcc  (21)
 
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Plus  reduce 37
-	Times  reduce 37
-	Rpar  reduce 37
-	Div  reduce 37
-	And  reduce 37
-	Or  reduce 37
-	RBracket  reduce 37
-	RAcc  reduce 37
-	PVirgule  reduce 37
-	Virgule  reduce 37
-	Minus  reduce 37
-
-
-state 100
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr Comp_lt expr .  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 39
-
-
-state 101
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr Comp_le expr .  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 40
-
-
-state 102
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr Comp_gt expr .  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 41
-
-
-state 103
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr Comp_ge expr .  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 42
-
-
-state 104
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr Double_eq expr .  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 43
-
-
-state 105
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr Triple_eq expr .  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 45
-
-
-state 106
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr Diff expr .  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 44
-
-
-state 107
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr Double_diff expr .  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	.  reduce 46
-
-
-state 108
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr And expr .  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
-	Minus  shift 72
-	Rpar  reduce 47
-	And  reduce 47
-	Or  reduce 47
-	RBracket  reduce 47
-	RAcc  reduce 47
-	PVirgule  reduce 47
-	Virgule  reduce 47
-
-
-state 109
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr Or expr .  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	LBracket  shift 70
-	Minus  shift 72
-	Rpar  reduce 48
-	Or  reduce 48
-	RBracket  reduce 48
-	RAcc  reduce 48
-	PVirgule  reduce 48
-	Virgule  reduce 48
-
-
-state 110
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr LBracket expr . RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	RBracket  shift 126
-	Minus  shift 72
+	RAcc  shift 84
 	.  error
 
 
-state 111
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr Minus expr .  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
+state 41
+	expr : LAcc obj_list . RAcc  (38)
 
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	LBracket  shift 70
+	RAcc  shift 85
+	.  error
+
+
+state 42
+	binding : Id .  (63)
+	binding : Id . DPoints type_expr  (64)
+	binding : Id . Eq expr  (65)
+	binding : Id . DPoints type_expr Eq expr  (66)
+
+	Eq  shift 86
+	DPoints  shift 87
+	Rpar  reduce 63
+	PVirgule  reduce 63
+	Virgule  reduce 63
+
+
+state 43
+	instr_mached : Var_decl bindings . PVirgule  (22)
+
+	PVirgule  shift 88
+	.  error
+
+
+state 44
+	bindings : binding .  (67)
+	bindings : binding . Virgule bindings  (68)
+
+	Virgule  shift 89
+	Rpar  reduce 67
+	PVirgule  reduce 67
+
+
+state 45
+	instr_mached : If Lpar . expr Rpar instr_mached Else instr_mached  (23)
+	instr_non_mached : If Lpar . expr Rpar instr  (27)
+	instr_non_mached : If Lpar . expr Rpar instr_mached Else instr_non_mached  (28)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 90
+	left_mem  goto 32
+
+
+state 46
+	instr_mached : While Lpar . expr Rpar instr_mached  (24)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 91
+	left_mem  goto 32
+
+
+state 47
+	instr_mached : Return PVirgule .  (25)
+
+	.  reduce 25
+
+
+state 48
+	instr_mached : Return expr . PVirgule  (26)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	PVirgule  shift 92
+	Minus  shift 76
+	.  error
+
+
+state 49
+	decl : Type Id . Eq type_expr PVirgule  (13)
+
+	Eq  shift 93
+	.  error
+
+
+state 50
+	decl : Let bindings . PVirgule  (14)
+
+	PVirgule  shift 94
+	.  error
+
+
+state 51
+	decl : Const bindings . PVirgule  (15)
+
+	PVirgule  shift 95
+	.  error
+
+
+state 52
+	decl : Function Id . Lpar bindings Rpar return_type LAcc decl_instr_list RAcc  (16)
+
+	Lpar  shift 96
+	.  error
+
+
+state 53
+	expr : Minus expr .  (35)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
 	Plus  reduce 35
 	Rpar  reduce 35
 	And  reduce 35
@@ -2186,454 +967,1916 @@ state 111
 	Minus  reduce 35
 
 
-state 112
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	expr : left_mem Eq expr .  (50)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
+state 54
+	s : decl_instr_list EOF .  (1)
 
-	.  reduce 50
+	.  reduce 1
 
 
-state 113
-	expr_list_2 : Virgule expr_list .  (54)
+state 55
+	decl_instr_list2 : EOL .  (8)
 
-	.  reduce 54
+	.  reduce 8
 
 
-state 114
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	obj_list : Id DPoints expr .  (55)
-	obj_list : Id DPoints expr . Virgule obj_list  (56)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Virgule  shift 127
-	Minus  shift 72
-	RAcc  reduce 55
-
-
-state 115
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	binding : Id Eq expr .  (59)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Minus  shift 72
-	Rpar  reduce 59
-	PVirgule  reduce 59
-	Virgule  reduce 59
-
-
-state 116
-	type_expr : Type_num .  (66)
-
-	.  reduce 66
-
-
-state 117
-	type_expr : Type_bool .  (67)
-
-	.  reduce 67
-
-
-state 118
-	type_expr : Type_string .  (68)
-
-	.  reduce 68
-
-
-state 119
-	binding : Id DPoints type_expr .  (58)
-	binding : Id DPoints type_expr . Eq expr  (60)
-
-	Eq  shift 128
-	Rpar  reduce 58
-	PVirgule  reduce 58
-	Virgule  reduce 58
-
-
-state 120
-	bindings : binding Virgule bindings .  (62)
-
-	.  reduce 62
-
-
-state 121
-	instr : If Lpar expr Rpar . instr  (18)
-	instr : If Lpar expr Rpar . instr Else instr  (19)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	instr  goto 129
-	expr  goto 28
-	left_mem  goto 29
-
-
-state 122
-	instr : While Lpar expr Rpar . instr  (20)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	instr  goto 130
-	expr  goto 28
-	left_mem  goto 29
-
-
-state 123
-	decl : Type Id Eq type_expr . PVirgule  (10)
-
-	PVirgule  shift 131
-	.  error
-
-
-state 124
-	decl : Function Id Lpar bindings . Rpar return_type LAcc decl_instr_list RAcc  (13)
-
-	Rpar  shift 132
-	.  error
-
-
-state 125
-	expr : expr Lpar expr_list Rpar .  (49)
-
-	.  reduce 49
-
-
-state 126
-	left_mem : expr LBracket expr RBracket .  (64)
-
-	.  reduce 64
-
-
-state 127
-	obj_list : Id DPoints expr Virgule . obj_list  (56)
-
-	Id  shift 74
-	.  error
-
-	obj_list  goto 133
-
-
-state 128
-	binding : Id DPoints type_expr Eq . expr  (60)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 30
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	expr  goto 134
-	left_mem  goto 29
-
-
-129: shift/reduce conflict (shift 135, reduce 18) on Else
-state 129
-	instr : If Lpar expr Rpar instr .  (18)
-	instr : If Lpar expr Rpar instr . Else instr  (19)
-
-	Else  shift 135
-	EOL  reduce 18
-	RAcc  reduce 18
-	PVirgule  reduce 18
-
-
-state 130
-	instr : While Lpar expr Rpar instr .  (20)
-
-	.  reduce 20
-
-
-state 131
-	decl : Type Id Eq type_expr PVirgule .  (10)
-
-	.  reduce 10
-
-
-state 132
-	decl : Function Id Lpar bindings Rpar . return_type LAcc decl_instr_list RAcc  (13)
-	return_type : .  (8)
-
-	DPoints  shift 136
-	LAcc  reduce 8
-
-	return_type  goto 137
-
-
-state 133
-	obj_list : Id DPoints expr Virgule obj_list .  (56)
-
-	.  reduce 56
-
-
-state 134
-	expr : expr . Plus expr  (34)
-	expr : expr . Minus expr  (35)
-	expr : expr . Times expr  (36)
-	expr : expr . Div expr  (37)
-	expr : expr . Exp expr  (38)
-	expr : expr . Comp_lt expr  (39)
-	expr : expr . Comp_le expr  (40)
-	expr : expr . Comp_gt expr  (41)
-	expr : expr . Comp_ge expr  (42)
-	expr : expr . Double_eq expr  (43)
-	expr : expr . Diff expr  (44)
-	expr : expr . Triple_eq expr  (45)
-	expr : expr . Double_diff expr  (46)
-	expr : expr . And expr  (47)
-	expr : expr . Or expr  (48)
-	expr : expr . Lpar expr_list Rpar  (49)
-	binding : Id DPoints type_expr Eq expr .  (60)
-	left_mem : expr . LBracket expr RBracket  (64)
-	left_mem : expr . Point Id  (65)
-
-	Plus  shift 54
-	Times  shift 55
-	Lpar  shift 56
-	Point  shift 57
-	Exp  shift 58
-	Div  shift 59
-	Comp_lt  shift 60
-	Comp_le  shift 61
-	Comp_gt  shift 62
-	Comp_ge  shift 63
-	Double_eq  shift 64
-	Triple_eq  shift 65
-	Diff  shift 66
-	Double_diff  shift 67
-	And  shift 68
-	Or  shift 69
-	LBracket  shift 70
-	Minus  shift 72
-	Rpar  reduce 60
-	PVirgule  reduce 60
-	Virgule  reduce 60
-
-
-state 135
-	instr : If Lpar expr Rpar instr Else . instr  (19)
-
-	Plus  shift 3
-	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
-	.  error
-
-	instr  goto 138
-	expr  goto 28
-	left_mem  goto 29
-
-
-state 136
-	return_type : DPoints . type_expr  (9)
-
-	Type_num  shift 116
-	Type_bool  shift 117
-	Type_string  shift 118
-	.  error
-
-	type_expr  goto 139
-
-
-state 137
-	decl : Function Id Lpar bindings Rpar return_type . LAcc decl_instr_list RAcc  (13)
-
-	LAcc  shift 140
-	.  error
-
-
-state 138
-	instr : If Lpar expr Rpar instr Else instr .  (19)
-
-	.  reduce 19
-
-
-state 139
-	return_type : DPoints type_expr .  (9)
-
-	.  reduce 9
-
-
-state 140
-	decl : Function Id Lpar bindings Rpar return_type LAcc . decl_instr_list RAcc  (13)
+state 56
+	decl_instr_list2 : PVirgule . decl_instr_list  (9)
+	decl_instr_list2 : PVirgule . EOL decl_instr_list  (10)
 	decl_instr_list : .  (4)
 
 	Plus  shift 3
 	Lpar  shift 4
-	Typeof  shift 5
-	LBracket  shift 6
-	LAcc  shift 7
-	PVirgule  shift 8
-	Var_decl  shift 9
-	If  shift 10
-	While  shift 11
-	Return  shift 12
-	Type  shift 13
-	Let  shift 14
-	Const  shift 15
-	Function  shift 16
-	Cst_int  shift 17
-	Cst_float  shift 18
-	Cst_bool  shift 19
-	Cst_string  shift 20
-	Id  shift 21
-	Minus  shift 22
+	EOL  shift 97
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Type  shift 14
+	Let  shift 15
+	Const  shift 16
+	Function  shift 17
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	EOF  reduce 4
 	RAcc  reduce 4
 
-	decl_instr_list  goto 141
-	decl_instr  goto 25
-	decl  goto 26
-	instr  goto 27
-	expr  goto 28
-	left_mem  goto 29
+	decl_instr_list  goto 98
+	decl_instr  goto 26
+	decl  goto 27
+	instr  goto 28
+	instr_mached  goto 29
+	instr_non_mached  goto 30
+	expr  goto 31
+	left_mem  goto 32
 
 
-state 141
-	decl : Function Id Lpar bindings Rpar return_type LAcc decl_instr_list . RAcc  (13)
+state 57
+	decl_instr_list : decl_instr decl_instr_list2 .  (6)
 
-	RAcc  shift 142
+	.  reduce 6
+
+
+state 58
+	expr : expr Plus . expr  (40)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 99
+	left_mem  goto 32
+
+
+state 59
+	expr : expr Times . expr  (42)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 100
+	left_mem  goto 32
+
+
+state 60
+	expr : expr Lpar . expr_list Rpar  (55)
+	expr_list : .  (57)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	Rpar  reduce 57
+
+	expr  goto 37
+	expr_list  goto 101
+	left_mem  goto 32
+
+
+state 61
+	left_mem : expr Point . Id  (71)
+
+	Id  shift 102
 	.  error
 
 
-state 142
-	decl : Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc .  (13)
+state 62
+	expr : expr Exp . expr  (44)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 103
+	left_mem  goto 32
+
+
+state 63
+	expr : expr Div . expr  (43)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 104
+	left_mem  goto 32
+
+
+state 64
+	expr : expr Comp_lt . expr  (45)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 105
+	left_mem  goto 32
+
+
+state 65
+	expr : expr Comp_le . expr  (46)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 106
+	left_mem  goto 32
+
+
+state 66
+	expr : expr Comp_gt . expr  (47)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 107
+	left_mem  goto 32
+
+
+state 67
+	expr : expr Comp_ge . expr  (48)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 108
+	left_mem  goto 32
+
+
+state 68
+	expr : expr Double_eq . expr  (49)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 109
+	left_mem  goto 32
+
+
+state 69
+	expr : expr Triple_eq . expr  (51)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 110
+	left_mem  goto 32
+
+
+state 70
+	expr : expr Diff . expr  (50)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 111
+	left_mem  goto 32
+
+
+state 71
+	expr : expr Double_diff . expr  (52)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 112
+	left_mem  goto 32
+
+
+state 72
+	expr : expr And . expr  (53)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 113
+	left_mem  goto 32
+
+
+state 73
+	expr : expr Or . expr  (54)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 114
+	left_mem  goto 32
+
+
+state 74
+	left_mem : expr LBracket . expr RBracket  (70)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 115
+	left_mem  goto 32
+
+
+state 75
+	instr_mached : expr PVirgule .  (20)
+
+	.  reduce 20
+
+
+state 76
+	expr : expr Minus . expr  (41)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 116
+	left_mem  goto 32
+
+
+state 77
+	expr : left_mem Eq . expr  (56)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 117
+	left_mem  goto 32
+
+
+state 78
+	obj_list : Id . DPoints expr  (61)
+	obj_list : Id . DPoints expr Virgule obj_list  (62)
+
+	DPoints  shift 83
+	.  error
+
+
+state 79
+	expr : Lpar expr Rpar .  (33)
+
+	.  reduce 33
+
+
+state 80
+	expr_list_2 : Virgule . expr_list  (60)
+	expr_list : .  (57)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	Rpar  reduce 57
+	RBracket  reduce 57
+
+	expr  goto 37
+	expr_list  goto 118
+	left_mem  goto 32
+
+
+state 81
+	expr_list : expr expr_list_2 .  (58)
+
+	.  reduce 58
+
+
+state 82
+	expr : LBracket expr_list RBracket .  (37)
+
+	.  reduce 37
+
+
+state 83
+	obj_list : Id DPoints . expr  (61)
+	obj_list : Id DPoints . expr Virgule obj_list  (62)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 119
+	left_mem  goto 32
+
+
+state 84
+	instr_mached : LAcc decl_instr_list RAcc .  (21)
+
+	.  reduce 21
+
+
+state 85
+	expr : LAcc obj_list RAcc .  (38)
+
+	.  reduce 38
+
+
+state 86
+	binding : Id Eq . expr  (65)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 120
+	left_mem  goto 32
+
+
+state 87
+	binding : Id DPoints . type_expr  (64)
+	binding : Id DPoints . type_expr Eq expr  (66)
+
+	Type_num  shift 121
+	Type_bool  shift 122
+	Type_string  shift 123
+	.  error
+
+	type_expr  goto 124
+
+
+state 88
+	instr_mached : Var_decl bindings PVirgule .  (22)
+
+	.  reduce 22
+
+
+state 89
+	bindings : binding Virgule . bindings  (68)
+
+	Id  shift 42
+	.  error
+
+	bindings  goto 125
+	binding  goto 44
+
+
+state 90
+	instr_mached : If Lpar expr . Rpar instr_mached Else instr_mached  (23)
+	instr_non_mached : If Lpar expr . Rpar instr  (27)
+	instr_non_mached : If Lpar expr . Rpar instr_mached Else instr_non_mached  (28)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Rpar  shift 126
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Minus  shift 76
+	.  error
+
+
+state 91
+	instr_mached : While Lpar expr . Rpar instr_mached  (24)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Rpar  shift 127
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Minus  shift 76
+	.  error
+
+
+state 92
+	instr_mached : Return expr PVirgule .  (26)
+
+	.  reduce 26
+
+
+state 93
+	decl : Type Id Eq . type_expr PVirgule  (13)
+
+	Type_num  shift 121
+	Type_bool  shift 122
+	Type_string  shift 123
+	.  error
+
+	type_expr  goto 128
+
+
+state 94
+	decl : Let bindings PVirgule .  (14)
+
+	.  reduce 14
+
+
+state 95
+	decl : Const bindings PVirgule .  (15)
+
+	.  reduce 15
+
+
+state 96
+	decl : Function Id Lpar . bindings Rpar return_type LAcc decl_instr_list RAcc  (16)
+
+	Id  shift 42
+	.  error
+
+	bindings  goto 129
+	binding  goto 44
+
+
+97: reduce/reduce conflict (reduce 4, reduce 5) on EOF
+97: reduce/reduce conflict (reduce 4, reduce 5) on RAcc
+state 97
+	decl_instr_list : EOL .  (5)
+	decl_instr_list2 : PVirgule EOL . decl_instr_list  (10)
+	decl_instr_list : .  (4)
+
+	Plus  shift 3
+	Lpar  shift 4
+	EOL  shift 5
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Type  shift 14
+	Let  shift 15
+	Const  shift 16
+	Function  shift 17
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	EOF  reduce 4
+	RAcc  reduce 4
+
+	decl_instr_list  goto 130
+	decl_instr  goto 26
+	decl  goto 27
+	instr  goto 28
+	instr_mached  goto 29
+	instr_non_mached  goto 30
+	expr  goto 31
+	left_mem  goto 32
+
+
+state 98
+	decl_instr_list2 : PVirgule decl_instr_list .  (9)
+
+	.  reduce 9
+
+
+state 99
+	expr : expr . Plus expr  (40)
+	expr : expr Plus expr .  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Plus  reduce 40
+	Rpar  reduce 40
+	And  reduce 40
+	Or  reduce 40
+	RBracket  reduce 40
+	RAcc  reduce 40
+	PVirgule  reduce 40
+	Virgule  reduce 40
+	Minus  reduce 40
+
+
+state 100
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr Times expr .  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Plus  reduce 42
+	Times  reduce 42
+	Rpar  reduce 42
+	Div  reduce 42
+	And  reduce 42
+	Or  reduce 42
+	RBracket  reduce 42
+	RAcc  reduce 42
+	PVirgule  reduce 42
+	Virgule  reduce 42
+	Minus  reduce 42
+
+
+state 101
+	expr : expr Lpar expr_list . Rpar  (55)
+
+	Rpar  shift 131
+	.  error
+
+
+state 102
+	left_mem : expr Point Id .  (71)
+
+	.  reduce 71
+
+
+state 103
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr Exp expr .  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Plus  reduce 44
+	Times  reduce 44
+	Rpar  reduce 44
+	Div  reduce 44
+	And  reduce 44
+	Or  reduce 44
+	RBracket  reduce 44
+	RAcc  reduce 44
+	PVirgule  reduce 44
+	Virgule  reduce 44
+	Minus  reduce 44
+
+
+state 104
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr Div expr .  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Plus  reduce 43
+	Times  reduce 43
+	Rpar  reduce 43
+	Div  reduce 43
+	And  reduce 43
+	Or  reduce 43
+	RBracket  reduce 43
+	RAcc  reduce 43
+	PVirgule  reduce 43
+	Virgule  reduce 43
+	Minus  reduce 43
+
+
+state 105
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr Comp_lt expr .  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 45
+
+
+state 106
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr Comp_le expr .  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 46
+
+
+state 107
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr Comp_gt expr .  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 47
+
+
+state 108
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr Comp_ge expr .  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 48
+
+
+state 109
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr Double_eq expr .  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 49
+
+
+state 110
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr Triple_eq expr .  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 51
+
+
+state 111
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr Diff expr .  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 50
+
+
+state 112
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr Double_diff expr .  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 52
+
+
+state 113
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr And expr .  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Minus  shift 76
+	Rpar  reduce 53
+	And  reduce 53
+	Or  reduce 53
+	RBracket  reduce 53
+	RAcc  reduce 53
+	PVirgule  reduce 53
+	Virgule  reduce 53
+
+
+state 114
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr Or expr .  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	LBracket  shift 74
+	Minus  shift 76
+	Rpar  reduce 54
+	Or  reduce 54
+	RBracket  reduce 54
+	RAcc  reduce 54
+	PVirgule  reduce 54
+	Virgule  reduce 54
+
+
+state 115
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr LBracket expr . RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	RBracket  shift 132
+	Minus  shift 76
+	.  error
+
+
+state 116
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr Minus expr .  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	LBracket  shift 74
+	Plus  reduce 41
+	Rpar  reduce 41
+	And  reduce 41
+	Or  reduce 41
+	RBracket  reduce 41
+	RAcc  reduce 41
+	PVirgule  reduce 41
+	Virgule  reduce 41
+	Minus  reduce 41
+
+
+state 117
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	expr : left_mem Eq expr .  (56)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	.  reduce 56
+
+
+state 118
+	expr_list_2 : Virgule expr_list .  (60)
+
+	.  reduce 60
+
+
+state 119
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	obj_list : Id DPoints expr .  (61)
+	obj_list : Id DPoints expr . Virgule obj_list  (62)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Virgule  shift 133
+	Minus  shift 76
+	RAcc  reduce 61
+
+
+state 120
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	binding : Id Eq expr .  (65)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Minus  shift 76
+	Rpar  reduce 65
+	PVirgule  reduce 65
+	Virgule  reduce 65
+
+
+state 121
+	type_expr : Type_num .  (72)
+
+	.  reduce 72
+
+
+state 122
+	type_expr : Type_bool .  (73)
+
+	.  reduce 73
+
+
+state 123
+	type_expr : Type_string .  (74)
+
+	.  reduce 74
+
+
+state 124
+	binding : Id DPoints type_expr .  (64)
+	binding : Id DPoints type_expr . Eq expr  (66)
+
+	Eq  shift 134
+	Rpar  reduce 64
+	PVirgule  reduce 64
+	Virgule  reduce 64
+
+
+state 125
+	bindings : binding Virgule bindings .  (68)
+
+	.  reduce 68
+
+
+state 126
+	instr_mached : If Lpar expr Rpar . instr_mached Else instr_mached  (23)
+	instr_non_mached : If Lpar expr Rpar . instr  (27)
+	instr_non_mached : If Lpar expr Rpar . instr_mached Else instr_non_mached  (28)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	instr  goto 135
+	instr_mached  goto 136
+	instr_non_mached  goto 30
+	expr  goto 31
+	left_mem  goto 32
+
+
+state 127
+	instr_mached : While Lpar expr Rpar . instr_mached  (24)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 137
+	While  shift 12
+	Return  shift 13
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	instr_mached  goto 138
+	expr  goto 31
+	left_mem  goto 32
+
+
+state 128
+	decl : Type Id Eq type_expr . PVirgule  (13)
+
+	PVirgule  shift 139
+	.  error
+
+
+state 129
+	decl : Function Id Lpar bindings . Rpar return_type LAcc decl_instr_list RAcc  (16)
+
+	Rpar  shift 140
+	.  error
+
+
+state 130
+	decl_instr_list2 : PVirgule EOL decl_instr_list .  (10)
+
+	.  reduce 10
+
+
+state 131
+	expr : expr Lpar expr_list Rpar .  (55)
+
+	.  reduce 55
+
+
+state 132
+	left_mem : expr LBracket expr RBracket .  (70)
+
+	.  reduce 70
+
+
+state 133
+	obj_list : Id DPoints expr Virgule . obj_list  (62)
+
+	Id  shift 78
+	.  error
+
+	obj_list  goto 141
+
+
+state 134
+	binding : Id DPoints type_expr Eq . expr  (66)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 142
+	left_mem  goto 32
+
+
+state 135
+	instr_non_mached : If Lpar expr Rpar instr .  (27)
+
+	.  reduce 27
+
+
+state 136
+	instr : instr_mached .  (17)
+	instr_mached : If Lpar expr Rpar instr_mached . Else instr_mached  (23)
+	instr_non_mached : If Lpar expr Rpar instr_mached . Else instr_non_mached  (28)
+
+	Else  shift 143
+	EOF  reduce 17
+	EOL  reduce 17
+	RAcc  reduce 17
+	PVirgule  reduce 17
+
+
+state 137
+	instr_mached : If . Lpar expr Rpar instr_mached Else instr_mached  (23)
+
+	Lpar  shift 144
+	.  error
+
+
+state 138
+	instr_mached : While Lpar expr Rpar instr_mached .  (24)
+
+	.  reduce 24
+
+
+state 139
+	decl : Type Id Eq type_expr PVirgule .  (13)
 
 	.  reduce 13
 
 
-State 129 contains 1 shift/reduce conflict.
+state 140
+	decl : Function Id Lpar bindings Rpar . return_type LAcc decl_instr_list RAcc  (16)
+	return_type : .  (11)
+
+	DPoints  shift 145
+	LAcc  reduce 11
+
+	return_type  goto 146
 
 
-49 terminals, 17 nonterminals
-70 grammar rules, 143 states
+state 141
+	obj_list : Id DPoints expr Virgule obj_list .  (62)
+
+	.  reduce 62
+
+
+state 142
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	binding : Id DPoints type_expr Eq expr .  (66)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Minus  shift 76
+	Rpar  reduce 66
+	PVirgule  reduce 66
+	Virgule  reduce 66
+
+
+state 143
+	instr_mached : If Lpar expr Rpar instr_mached Else . instr_mached  (23)
+	instr_non_mached : If Lpar expr Rpar instr_mached Else . instr_non_mached  (28)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	instr_mached  goto 147
+	instr_non_mached  goto 148
+	expr  goto 31
+	left_mem  goto 32
+
+
+state 144
+	instr_mached : If Lpar . expr Rpar instr_mached Else instr_mached  (23)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 33
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	expr  goto 149
+	left_mem  goto 32
+
+
+state 145
+	return_type : DPoints . type_expr  (12)
+
+	Type_num  shift 121
+	Type_bool  shift 122
+	Type_string  shift 123
+	.  error
+
+	type_expr  goto 150
+
+
+state 146
+	decl : Function Id Lpar bindings Rpar return_type . LAcc decl_instr_list RAcc  (16)
+
+	LAcc  shift 151
+	.  error
+
+
+state 147
+	instr_mached : If Lpar expr Rpar instr_mached Else instr_mached .  (23)
+
+	.  reduce 23
+
+
+state 148
+	instr_non_mached : If Lpar expr Rpar instr_mached Else instr_non_mached .  (28)
+
+	.  reduce 28
+
+
+state 149
+	instr_mached : If Lpar expr . Rpar instr_mached Else instr_mached  (23)
+	expr : expr . Plus expr  (40)
+	expr : expr . Minus expr  (41)
+	expr : expr . Times expr  (42)
+	expr : expr . Div expr  (43)
+	expr : expr . Exp expr  (44)
+	expr : expr . Comp_lt expr  (45)
+	expr : expr . Comp_le expr  (46)
+	expr : expr . Comp_gt expr  (47)
+	expr : expr . Comp_ge expr  (48)
+	expr : expr . Double_eq expr  (49)
+	expr : expr . Diff expr  (50)
+	expr : expr . Triple_eq expr  (51)
+	expr : expr . Double_diff expr  (52)
+	expr : expr . And expr  (53)
+	expr : expr . Or expr  (54)
+	expr : expr . Lpar expr_list Rpar  (55)
+	left_mem : expr . LBracket expr RBracket  (70)
+	left_mem : expr . Point Id  (71)
+
+	Plus  shift 58
+	Times  shift 59
+	Lpar  shift 60
+	Rpar  shift 152
+	Point  shift 61
+	Exp  shift 62
+	Div  shift 63
+	Comp_lt  shift 64
+	Comp_le  shift 65
+	Comp_gt  shift 66
+	Comp_ge  shift 67
+	Double_eq  shift 68
+	Triple_eq  shift 69
+	Diff  shift 70
+	Double_diff  shift 71
+	And  shift 72
+	Or  shift 73
+	LBracket  shift 74
+	Minus  shift 76
+	.  error
+
+
+state 150
+	return_type : DPoints type_expr .  (12)
+
+	.  reduce 12
+
+
+state 151
+	decl : Function Id Lpar bindings Rpar return_type LAcc . decl_instr_list RAcc  (16)
+	decl_instr_list : .  (4)
+
+	Plus  shift 3
+	Lpar  shift 4
+	EOL  shift 5
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 11
+	While  shift 12
+	Return  shift 13
+	Type  shift 14
+	Let  shift 15
+	Const  shift 16
+	Function  shift 17
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	RAcc  reduce 4
+
+	decl_instr_list  goto 153
+	decl_instr  goto 26
+	decl  goto 27
+	instr  goto 28
+	instr_mached  goto 29
+	instr_non_mached  goto 30
+	expr  goto 31
+	left_mem  goto 32
+
+
+state 152
+	instr_mached : If Lpar expr Rpar . instr_mached Else instr_mached  (23)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 137
+	While  shift 12
+	Return  shift 13
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	instr_mached  goto 154
+	expr  goto 31
+	left_mem  goto 32
+
+
+state 153
+	decl : Function Id Lpar bindings Rpar return_type LAcc decl_instr_list . RAcc  (16)
+
+	RAcc  shift 155
+	.  error
+
+
+state 154
+	instr_mached : If Lpar expr Rpar instr_mached . Else instr_mached  (23)
+
+	Else  shift 156
+	.  error
+
+
+state 155
+	decl : Function Id Lpar bindings Rpar return_type LAcc decl_instr_list RAcc .  (16)
+
+	.  reduce 16
+
+
+state 156
+	instr_mached : If Lpar expr Rpar instr_mached Else . instr_mached  (23)
+
+	Plus  shift 3
+	Lpar  shift 4
+	Typeof  shift 6
+	LBracket  shift 7
+	LAcc  shift 8
+	PVirgule  shift 9
+	Var_decl  shift 10
+	If  shift 137
+	While  shift 12
+	Return  shift 13
+	Cst_int  shift 18
+	Cst_float  shift 19
+	Cst_bool  shift 20
+	Cst_string  shift 21
+	Id  shift 22
+	Minus  shift 23
+	.  error
+
+	instr_mached  goto 147
+	expr  goto 31
+	left_mem  goto 32
+
+
+State 97 contains 2 reduce/reduce conflicts.
+
+
+51 terminals, 19 nonterminals
+76 grammar rules, 157 states
