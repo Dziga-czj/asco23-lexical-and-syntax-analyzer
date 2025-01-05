@@ -16,6 +16,8 @@
 %left Plus Minus
 %left Times Div
 %right Exp
+%left LBracket DPoints 
+%nonassoc Lpar
 
 %start s
 %type <Ast.ast> s
