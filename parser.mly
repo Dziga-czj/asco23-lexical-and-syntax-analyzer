@@ -14,6 +14,7 @@
 %left Plus Minus
 %left Times Div
 %right Exp
+%right Point
 %left LBracket DPoints 
 %nonassoc Eq Double_eq Diff Double_diff Triple_eq Comp_lt Comp_le Comp_gt Comp_ge
 

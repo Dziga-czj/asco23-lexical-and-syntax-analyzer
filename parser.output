@@ -502,7 +502,6 @@ state 30
 
 
 31: shift/reduce conflict (shift 55, reduce 28) on Lpar
-31: shift/reduce conflict (shift 56, reduce 28) on Point
 state 31
 	expr : Plus expr .  (28)
 	expr : expr . Plus expr  (32)
@@ -900,7 +899,6 @@ state 49
 
 
 50: shift/reduce conflict (shift 55, reduce 27) on Lpar
-50: shift/reduce conflict (shift 56, reduce 27) on Point
 state 50
 	expr : Minus expr .  (27)
 	expr : expr . Plus expr  (32)
@@ -1624,7 +1622,6 @@ state 92
 
 
 93: shift/reduce conflict (shift 55, reduce 32) on Lpar
-93: shift/reduce conflict (shift 56, reduce 32) on Point
 state 93
 	expr : expr . Plus expr  (32)
 	expr : expr Plus expr .  (32)
@@ -1672,7 +1669,6 @@ state 93
 
 
 94: shift/reduce conflict (shift 55, reduce 34) on Lpar
-94: shift/reduce conflict (shift 56, reduce 34) on Point
 state 94
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1733,7 +1729,6 @@ state 96
 
 
 97: shift/reduce conflict (shift 55, reduce 36) on Lpar
-97: shift/reduce conflict (shift 56, reduce 36) on Point
 state 97
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1781,7 +1776,6 @@ state 97
 
 
 98: shift/reduce conflict (shift 55, reduce 35) on Lpar
-98: shift/reduce conflict (shift 56, reduce 35) on Point
 state 98
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1829,7 +1823,6 @@ state 98
 
 
 99: shift/reduce conflict (shift 55, reduce 37) on Lpar
-99: shift/reduce conflict (shift 56, reduce 37) on Point
 state 99
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1852,10 +1845,10 @@ state 99
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 37
 	Times  reduce 37
 	Rpar  reduce 37
+	Point  reduce 37
 	Exp  reduce 37
 	Div  reduce 37
 	And  reduce 37
@@ -1869,7 +1862,6 @@ state 99
 
 
 100: shift/reduce conflict (shift 55, reduce 38) on Lpar
-100: shift/reduce conflict (shift 56, reduce 38) on Point
 state 100
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1892,10 +1884,10 @@ state 100
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 38
 	Times  reduce 38
 	Rpar  reduce 38
+	Point  reduce 38
 	Exp  reduce 38
 	Div  reduce 38
 	And  reduce 38
@@ -1909,7 +1901,6 @@ state 100
 
 
 101: shift/reduce conflict (shift 55, reduce 39) on Lpar
-101: shift/reduce conflict (shift 56, reduce 39) on Point
 state 101
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1932,10 +1923,10 @@ state 101
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 39
 	Times  reduce 39
 	Rpar  reduce 39
+	Point  reduce 39
 	Exp  reduce 39
 	Div  reduce 39
 	And  reduce 39
@@ -1949,7 +1940,6 @@ state 101
 
 
 102: shift/reduce conflict (shift 55, reduce 40) on Lpar
-102: shift/reduce conflict (shift 56, reduce 40) on Point
 state 102
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -1972,10 +1962,10 @@ state 102
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 40
 	Times  reduce 40
 	Rpar  reduce 40
+	Point  reduce 40
 	Exp  reduce 40
 	Div  reduce 40
 	And  reduce 40
@@ -1989,7 +1979,6 @@ state 102
 
 
 103: shift/reduce conflict (shift 55, reduce 41) on Lpar
-103: shift/reduce conflict (shift 56, reduce 41) on Point
 state 103
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2012,10 +2001,10 @@ state 103
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 41
 	Times  reduce 41
 	Rpar  reduce 41
+	Point  reduce 41
 	Exp  reduce 41
 	Div  reduce 41
 	And  reduce 41
@@ -2029,7 +2018,6 @@ state 103
 
 
 104: shift/reduce conflict (shift 55, reduce 43) on Lpar
-104: shift/reduce conflict (shift 56, reduce 43) on Point
 state 104
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2052,10 +2040,10 @@ state 104
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 43
 	Times  reduce 43
 	Rpar  reduce 43
+	Point  reduce 43
 	Exp  reduce 43
 	Div  reduce 43
 	And  reduce 43
@@ -2069,7 +2057,6 @@ state 104
 
 
 105: shift/reduce conflict (shift 55, reduce 42) on Lpar
-105: shift/reduce conflict (shift 56, reduce 42) on Point
 state 105
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2092,10 +2079,10 @@ state 105
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 42
 	Times  reduce 42
 	Rpar  reduce 42
+	Point  reduce 42
 	Exp  reduce 42
 	Div  reduce 42
 	And  reduce 42
@@ -2109,7 +2096,6 @@ state 105
 
 
 106: shift/reduce conflict (shift 55, reduce 44) on Lpar
-106: shift/reduce conflict (shift 56, reduce 44) on Point
 state 106
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2132,10 +2118,10 @@ state 106
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 44
 	Times  reduce 44
 	Rpar  reduce 44
+	Point  reduce 44
 	Exp  reduce 44
 	Div  reduce 44
 	And  reduce 44
@@ -2149,7 +2135,6 @@ state 106
 
 
 107: shift/reduce conflict (shift 55, reduce 45) on Lpar
-107: shift/reduce conflict (shift 56, reduce 45) on Point
 state 107
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2197,7 +2182,6 @@ state 107
 
 
 108: shift/reduce conflict (shift 55, reduce 46) on Lpar
-108: shift/reduce conflict (shift 56, reduce 46) on Point
 state 108
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2288,7 +2272,6 @@ state 109
 
 
 110: shift/reduce conflict (shift 55, reduce 33) on Lpar
-110: shift/reduce conflict (shift 56, reduce 33) on Point
 state 110
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2336,7 +2319,6 @@ state 110
 
 
 111: shift/reduce conflict (shift 55, reduce 48) on Lpar
-111: shift/reduce conflict (shift 56, reduce 48) on Point
 state 111
 	expr : expr . Plus expr  (32)
 	expr : expr . Minus expr  (33)
@@ -2359,10 +2341,10 @@ state 111
 	left_mem : expr . Point Id  (63)
 
 	Lpar  shift 55
-	Point  shift 56
 	Plus  reduce 48
 	Times  reduce 48
 	Rpar  reduce 48
+	Point  reduce 48
 	Exp  reduce 48
 	Div  reduce 48
 	And  reduce 48
@@ -2796,25 +2778,25 @@ state 141
 	.  reduce 11
 
 
-State 31 contains 2 shift/reduce conflicts.
+State 31 contains 1 shift/reduce conflict.
 State 33 contains 18 shift/reduce conflicts.
-State 50 contains 2 shift/reduce conflicts.
-State 93 contains 2 shift/reduce conflicts.
-State 94 contains 2 shift/reduce conflicts.
-State 97 contains 2 shift/reduce conflicts.
-State 98 contains 2 shift/reduce conflicts.
-State 99 contains 2 shift/reduce conflicts.
-State 100 contains 2 shift/reduce conflicts.
-State 101 contains 2 shift/reduce conflicts.
-State 102 contains 2 shift/reduce conflicts.
-State 103 contains 2 shift/reduce conflicts.
-State 104 contains 2 shift/reduce conflicts.
-State 105 contains 2 shift/reduce conflicts.
-State 106 contains 2 shift/reduce conflicts.
-State 107 contains 2 shift/reduce conflicts.
-State 108 contains 2 shift/reduce conflicts.
-State 110 contains 2 shift/reduce conflicts.
-State 111 contains 2 shift/reduce conflicts.
+State 50 contains 1 shift/reduce conflict.
+State 93 contains 1 shift/reduce conflict.
+State 94 contains 1 shift/reduce conflict.
+State 97 contains 1 shift/reduce conflict.
+State 98 contains 1 shift/reduce conflict.
+State 99 contains 1 shift/reduce conflict.
+State 100 contains 1 shift/reduce conflict.
+State 101 contains 1 shift/reduce conflict.
+State 102 contains 1 shift/reduce conflict.
+State 103 contains 1 shift/reduce conflict.
+State 104 contains 1 shift/reduce conflict.
+State 105 contains 1 shift/reduce conflict.
+State 106 contains 1 shift/reduce conflict.
+State 107 contains 1 shift/reduce conflict.
+State 108 contains 1 shift/reduce conflict.
+State 110 contains 1 shift/reduce conflict.
+State 111 contains 1 shift/reduce conflict.
 State 128 contains 1 shift/reduce conflict.
 
 
