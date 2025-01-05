@@ -94,7 +94,7 @@ expr :
     | expr Or expr { Disj ($1, $3) }
     | Typeof expr { Typeof $2 }
     | LBracket expr_list RBracket { Tab $2 }
-    | LAcc obj_list RAcc { Object $2 }
+    | LAcc obj_list RAcc { Obj $2 }
     | expr Lpar expr_list Rpar { Func_call ($1, $3) }
 
 
@@ -105,14 +105,14 @@ expr_list :
 (* Objets *)
 
 obj_list :
-  | Id DPoints expr { [($1, $3)] } 
-  | Id DPoints expr Virgule obj_list { ($1, $3) :: $5 } 
+  | Id DPoints expr { [(Id $1, $3)] } 
+  | Id DPoints expr Virgule obj_list { (Id $1, $3) :: $5 } 
 
 binding :
-  | Id { Binding ($1, None, None) } (* i *)
-  | Id DPoints type_expr { Binding ($1, Some $3, None) } (* i : t *)
-  | Id Eq expr { Binding ($1, None, Some $3) } (* i = e *)
-  | Id DPoints type_expr Eq expr { Binding ($1, Some $3, Some $5) } (* i : t = e *)
+  | Id { Bind_Simple (Id $1) }  (* var a *)
+  | Id DPoints type_expr { Bind_typed (Id $1, $3) }  (* var a : t *)
+  | Id Eq expr { Bind_expr (Id $1, $3) }  (* var a = e *)
+  | Id DPoints type_expr Eq expr { Bind_Double (Id $1, $3, $5) }  (* var a : t = e *)
 
 bindings :
   | binding { [$1] } (* une déclaration *)
@@ -120,11 +120,11 @@ bindings :
 
 left_mem :
     | Id { Left_mem (Id $1) }
-    | expr LBracket expr RBracket { Left_mem (ArrayAccess ($1, $3)) }
-    | expr DPoints Id { Left_mem (FieldAccess ($1, $3)) }
+    | expr LBracket expr RBracket { Left_mem (Tab_affect ($1, $3)) }
+    | expr DPoints Id { Left_mem (Point_sep ($1, Id $3)) }
 
 type_expr : 
-  | Type_num { TypeNum }
-  | Type_bool { TypeBool }
-  | Type_string { TypeString }
+  | Type_num { Number }
+  | Type_bool { Boolean }
+  | Type_string { String }
 
