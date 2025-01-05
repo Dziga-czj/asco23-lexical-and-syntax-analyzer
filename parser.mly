@@ -2,7 +2,7 @@
     open Ast
 %}
 
-%token Plus Times Lpar Rpar EOL Comment Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints Var_decl If Else While Return Type Let Const Function
+%token Plus Times Lpar Rpar Point EOL Comment Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints Var_decl If Else While Return Type Let Const Function
 %token <int> Cst_int
 %token <float> Cst_float
 %token <bool> Cst_bool
@@ -11,12 +11,11 @@
 
 %left Or
 %left And
-%left Eq Double_eq Diff Double_diff Triple_eq
-%left Comp_lt Comp_le Comp_gt Comp_ge
 %left Plus Minus
 %left Times Div
-%right Exp Virgule
-%right PVirgule 
+%right Exp
+%left LBracket DPoints 
+%nonassoc Eq Double_eq Diff Double_diff Triple_eq Comp_lt Comp_le Comp_gt Comp_ge
 
 %start s
 %type <Ast.ast> s
@@ -69,8 +68,13 @@ expr :
     | Cst_float { Cst (Cst_float $1) }
     | Cst_bool { Cst (Cst_bool $1) }
     | Cst_string { Cst (Cst_string $1) }
-    | left_mem { $1 } 
-    | Lpar expr Rpar { Par $2 }
+    | Lpar expr Rpar { Par $2 } 
+    | Typeof expr %prec Typeof { Typeof $2 }
+    | Minus expr %prec Minus { Minus $2 }
+    | Plus expr %prec Plus { Plus $2 }
+    | LBracket expr_list RBracket { Tab $2 }
+    | LAcc obj_list RAcc { Obj $2 }
+    | left_mem { $1 }
     | expr Plus expr { Add ($1, $3) }
     | expr Minus expr { Sub ($1, $3) }
     | expr Times expr { Mul ($1, $3) }
@@ -86,15 +90,17 @@ expr :
     | expr Double_diff expr { Double_diff ($1, $3) }
     | expr And expr { Conj ($1, $3) }
     | expr Or expr { Disj ($1, $3) }
-    | Typeof expr { Typeof $2 }
-    | LBracket expr_list RBracket { Tab $2 }
-    | LAcc obj_list RAcc { Obj $2 }
     | expr Lpar expr_list Rpar { Func_call ($1, $3) }
+    | left_mem Eq expr { $1 }
 
 
 expr_list :
-  | expr { [$1] } 
-  | expr Virgule expr_list { $1 :: $3 } 
+  | { [] } 
+  | expr expr_list_2 { $1::$2 } 
+
+expr_list_2 :
+  |  { [] }
+  | Virgule expr_list { $2 }
 
 (* Objets *)
 
@@ -115,7 +121,7 @@ bindings :
 left_mem :
     | Id { Left_mem (Id $1) }
     | expr LBracket expr RBracket { Left_mem (Tab_affect ($1, $3)) }
-    | expr DPoints Id { Left_mem (Point_sep ($1, Id $3)) }
+    | expr Point Id { Left_mem (Point_sep ($1, Id $3)) }
 
 type_expr : 
   | Type_num { Number }

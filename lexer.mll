@@ -47,6 +47,7 @@ rule decoupe = parse
 | "let" { Let }
 | "const" { Const }
 | "function" { Function }
+| "." { Point}
 (*------------------------- constantes -------------------------*)
 (* const decimales *)
 | ['1'-'9']['0'-'9''_']* as i { Cst_int (int_of_string2 i) }
