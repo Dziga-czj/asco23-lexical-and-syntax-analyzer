@@ -35,13 +35,6 @@ decl_instr_list :
   | decl_instr { [$1] } (* une seule déclaration ou instruction *)
   | decl_instr PVirgule decl_instr_list { $1 :: $3 } (* plusieurs decl/instr séparées par des ; *)
 
-(* Déclarations *)
-
-param_list :
-    |   { [] } 
-    | Id { [$1] } 
-    | Id Virgule param_list { $1 :: $3 } 
-
 return_type :
     |   { None } 
     | DPoints type_expr { Some $2 } 
