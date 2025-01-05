@@ -15,7 +15,8 @@
 %left Comp_lt Comp_le Comp_gt Comp_ge
 %left Plus Minus
 %left Times Div
-%right Exp
+%right Exp Virgule
+%right PVirgule 
 
 %start s
 %type <Ast.ast> s
