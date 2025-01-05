@@ -12,10 +12,12 @@
 %left Or
 %left And
 %left Plus Minus
+%left Typeof
 %left Times Div
 %right Exp
 %right Point
 %left LBracket DPoints 
+%left Lpar
 %nonassoc Eq Double_eq Diff Double_diff Triple_eq Comp_lt Comp_le Comp_gt Comp_ge
 
 %start s
@@ -33,8 +35,12 @@ decl_instr :
   | instr { I_or_D_instr $1 } (* une instruction *)
 
 decl_instr_list :
-  | decl_instr { [$1] } (* une seule déclaration ou instruction *)
-  | decl_instr PVirgule decl_instr_list { $1 :: $3 } (* plusieurs decl/instr séparées par des ; *)
+  | { [] }
+  | decl_instr decl_instr_list2 { $1::$2 }
+
+decl_instr_list2 :
+  | { [] } (* une seule déclaration ou instruction *)
+  | PVirgule decl_instr_list { $2 } (* plusieurs decl/instr séparées par des ; *)
 
 return_type :
     |   { None } 
@@ -93,6 +99,7 @@ expr :
     | expr Or expr { Disj ($1, $3) }
     | expr Lpar expr_list Rpar { Func_call ($1, $3) }
     | left_mem Eq expr { $1 }
+
 
 
 expr_list :
