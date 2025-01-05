@@ -13,7 +13,7 @@ test_decoupe: lexer.cmo test_decoupe.cmo
 	ocamlc -o $@ $^
 
 parser.ml: parser.mly
-	ocamlyacc $<
+	ocamlyacc -v $<
 
 parser.cmo: ast.cmi parser.cmi
 
