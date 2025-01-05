@@ -70,9 +70,9 @@ expr :
     | Cst_bool { Cst (Cst_bool $1) }
     | Cst_string { Cst (Cst_string $1) }
     | Lpar expr Rpar { Par $2 } 
-    | Typeof expr  { Typeof $2 }
-    | Minus expr { Minus $2 }
-    | Plus expr { Plus $2 }
+    | Typeof expr %prec Typeof { Typeof $2 }
+    | Minus expr %prec Minus { Minus $2 }
+    | Plus expr %prec Plus { Plus $2 }
     | LBracket expr_list RBracket { Tab $2 }
     | LAcc obj_list RAcc { Obj $2 }
     | left_mem { $1 }
