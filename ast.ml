@@ -119,40 +119,61 @@ let check_scope_instr i table =
   match i with ->
     | Empty -> table
     | Pt_virgule expr -> check_scope_expr expr table
-    | Bloc inst_or_decl_list ->
-      let rec aux acc curr_table = 
-        match curr with
-        | [] -> acc
-        | hd :: tl ->
-          match hd with ->
-            | I_or_D_instr instr -> 
-              let new_table = check_scope_instr instr curr_table in
-              aux acc new_table tl
-            | I_or_D_decl decl -> 
-              let new_table = check_scope_decl decl curr_table in
-              aux acc new_table tl
-      in aux table inst_or_decl_list
-    | Var_decl b_list ->
-      add_b_list b_list table
+    | Bloc inst_or_decl_list -> check_i_or_d_l_scope inst_or_decl_list table
+    | Var_decl b_list -> add_b_list b_list table
     | If (cond, then_instr, else_instr_opt) -> 
       let table_after_cond = check_scope_expr cond table in
       let table_after_then = check_scope_instr then_instr table_after_cond in
       (match else_instr_opt with
         | None -> table_after_then
         | Some else_instr -> check_scope_instr else_instr table_after_then)
-    
     | While (cond, body_instr) -> 
         let table_after_cond = check_scope_expr cond table in
         check_scope_instr body_instr table_after_cond
-    
     | Return expr_opt -> 
       (match expr_opt with
       | None -> table
       | Some expr -> check_scope_expr expr table)
 
 
-let check_i_or_d_l_scope l table =
+let rec check_scope_expr e table =
+  match e with
+  | Par expr -> check_scope_expr expr table  
+  | Cst _ -> table  
+  | Left_mem left -> 
+    check_scope_left left table  
+  | Obj obj_list -> 
+    List.fold_left (fun acc (_, expr) -> check_scope_expr expr acc) table obj_list
+  | Tab expr_list -> 
+    List.fold_left (fun acc expr -> check_scope_expr expr acc) table expr_list
+  | Func_call (expr, args) -> 
+    let table_after_func = check_scope_expr expr table in
+    List.fold_left (fun acc arg -> check_scope_expr arg acc) table_after_func args
+  | Typeof expr -> 
+    check_scope_expr expr table  
+  | Plus (expr1, expr2) | Minus (expr1, expr2) 
+  | Exp (expr1, expr2) | Mul (expr1, expr2) 
+  | Div (expr1, expr2) -> 
+    (* affecte pas la table *)
+    let table_after_expr1 = check_scope_expr expr1 table in
+    check_scope_expr expr2 table_after_expr1
+  | Add (expr1, expr2) | Sub (expr1, expr2) 
+  | GT (expr1, expr2) | GE (expr1, expr2) 
+  | LT (expr1, expr2) | LE (expr1, expr2) 
+  | Eq (expr1, expr2) | Diff (expr1, expr2) 
+  | Triple_eq (expr1, expr2) | Double_diff (expr1, expr2) 
+  | Conj (expr1, expr2) | Disj (expr1, expr2) -> 
+    (* affecte pas la table *)
+    let table_after_expr1 = check_scope_expr expr1 table in
+    check_scope_expr expr2 table_after_expr1
 
+  | Affect (left, expr) -> 
+    (* Vérifie si l'identifiant à gauche de l'affectation est bien dans la table, puis l'expression à droite *)
+    let table_after_left = check_scope_left left table in
+    check_scope_expr expr table_after_left
+
+
+let check_i_or_d_l_scope l table =
   let rec aux curr acc table =
     match curr with
     | [] -> acc
@@ -161,6 +182,20 @@ let check_i_or_d_l_scope l table =
               | I_or_D_decl d -> let table' = check_scope_decl d table in aux q acc' table'
 
   in aux a true table
+
+let check_left_scope l table =
+  match l with
+  | Left_id i ->
+      if Table.mem i table.table then table
+      else failwith ("id not declared")
+  | Tab_affect (arr_expr, index_expr) ->
+      (* check l'expr du tableau et de l'index*)
+      let table_after_arr = check_scope_expr arr_expr table in
+      check_scope_expr index_expr table_after_arr
+  | Point_sep (obj_expr, _) ->
+      (* check l'expr de l'objet *)
+      check_scope_expr obj_expr table
+
 
 let check_scope a =
   check_i_or_d_l_scope a Table.empty
