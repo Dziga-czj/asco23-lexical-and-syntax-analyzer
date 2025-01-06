@@ -102,21 +102,33 @@ let add_b_list b_list t =
       let updated_table = { t with last = t.last + 1; table = updated_table } in
       add_b_list q updated_table
 
+let check_scope_binding (Binding (id, type_opt, expr_opt)) table =
+  let table_after_type = 
+    match type_opt with
+    | None -> table
+    | Some t -> check_scope_type t table
+  in
+  match expr_opt with
+  | None -> table_after_type
+  | Some expr -> check_scope_expr expr table_after_type
+
 
 let check_scope_decl d table : Table.t =
   match d with 
-  | Type_alias (i, t) -> failwith "TODO"
+  | Type_alias (i, t) -> let table_after_type = check_scope_type t table in 
+    add_id i table_after_type
   | Let_decl (b_list) -> add_b_list b_list table
   | Const_decl (b_list) -> add_b_list b_list table
   (*pour la fonction on ajoute l'id a la table globale
   on ajoute les paramètres a la table avec add_b_list
   puis on check les instr et decl dans la fonction*)
-  | Func_decl of (i, b_list, typ, inst_or_decl_l) -> let table' = add_id i table in
-                                                    let table' = add_b_list b_list table' in 
-                                                    check_i_or_d_l_scope inst_or_decl_l table'
+  | Func_decl (i, b_list, typ, inst_or_decl_l) -> 
+    let table' = add_id i table in
+    let table' = add_b_list b_list table' in 
+    check_i_or_d_l_scope inst_or_decl_l table'
 
 let check_scope_instr i table =
-  match i with ->
+  match i with 
     | Empty -> table
     | Pt_virgule expr -> check_scope_expr expr table
     | Bloc inst_or_decl_list -> check_i_or_d_l_scope inst_or_decl_list table
@@ -196,10 +208,86 @@ let check_left_scope l table =
       (* check l'expr de l'objet *)
       check_scope_expr obj_expr table
 
+let rec check_scope_type t table =
+  match t with
+  | Identifiant i ->
+      (* Vérifie si le type référencé par l'identifiant est bien déclaré dans la table *)
+      if Table.mem i table.table then table
+      else failwith ("Type " ^ i ^ " not declared")
+  | Constante _ -> table
+  | Number | Boolean | String | Any -> table
+  | Tableau sub_type ->
+      check_scope_type sub_type table
+  | Object fields ->
+      List.fold_left
+        (fun acc (_, field_type_opt) ->
+          match field_type_opt with
+          | None -> acc
+          | Some field_type -> check_scope_type field_type acc)
+        table
+        fields
+  | Union type_list ->
+      List.fold_left
+        (fun acc sub_type -> check_scope_type sub_type acc)
+        table
+        type_list
+
+
 
 let check_scope a =
   check_i_or_d_l_scope a Table.empty
     
+(* Cas de test *)
+
+let ast1 = [
+  I_or_D_decl (Let_decl [Binding (Id "x", Some Number, Some (Cst (Cst_int 5)))])
+]
+
+let ast2 = [
+  I_or_D_instr (Pt_virgule (Left_mem (Left_id "y")))
+]
+
+let ast3 = [
+  I_or_D_decl (
+    Func_decl (
+      Id "myFunc",
+      [Binding (Id "a", Some Number, None); Binding (Id "b", Some Number, None)],
+      Some Number,
+      [
+        I_or_D_instr (Var_decl [Binding (Id "x", Some Number, Some (Add (Left_mem (Left_id "a"), Left_mem (Left_id "b"))))]);
+        I_or_D_instr (Return (Some (Left_mem (Left_id "x"))))
+      ]
+    )
+  )
+]
+
+let ast4 = [
+  I_or_D_decl (Type_alias (Id "MyType", Number));
+  I_or_D_decl (Let_decl [Binding (Id "y", Some (Identifiant "MyType"), Some (Cst (Cst_int 10)))])
+]
+
+(* Fonction de test *)
+let test_check_scope ast =
+  try
+    let _ = check_scope ast in
+    print_endline "Scope check passed!"
+  with
+  | Failure msg -> print_endline ("Scope check failed: " ^ msg)
+  | Undeclared_variable var -> print_endline ("Undeclared variable: " ^ var)
+
+let () =
+  print_endline "Testing AST 1...";
+  test_check_scope ast1;
+
+  print_endline "Testing AST 2...";
+  test_check_scope ast2;
+
+  print_endline "Testing AST 3...";
+  test_check_scope ast3;
+
+  print_endline "Testing AST 4...";
+  test_check_scope ast4
+
 (* ________________________________________PRINTING___________________________________________________*)
 let rec print_id (Id s) = print_string s
 
