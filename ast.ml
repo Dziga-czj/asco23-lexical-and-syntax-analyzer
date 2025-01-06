@@ -7,25 +7,20 @@ type const =
   | Cst_bool of bool
   | Cst_string of string
 
-type prim =
-  | Num of int
-  | Bool of bool
-  | Str of string
-
-type type_ = 
-  | Identifiant
-  | Constante
+and type_ = 
+  | Identifiant of string
+  | Constante of const
   | Number
   | Boolean
   | String
-  | Tableau
+  | Tableau of type_
   | Any
-  | Object
-  | Union
+  | Object of (id * type_ option) list
+  | Union of type_ list
 
 (* and sers a ce que il reconaisse tout les types en même temps pour pouvoir les utiliser mutuellement *)
 and left = 
-  | Id of string
+  | Left_id of string
   | Tab_affect of (expr * expr) (* e[e] *)
   | Point_sep of (expr * id) (* e.i *)
 
@@ -65,11 +60,7 @@ and instr =
   | While of expr * instr
   | Return of expr option
 
-and binding =  
-  | Bind_Simple of id (* var a*)
-  | Bind_Double of id * type_ * expr (* var a : type = expr; *)
-  | Bind_typed of id * type_ (* var a : type;*)
-  | Bind_expr of id * expr (* var a = expr; *)
+and binding = Binding of id * type_ option * expr option
 
 and inst_or_decl = 
   | I_or_D_instr of instr 
@@ -97,11 +88,104 @@ let rec print_sep_spec = function
 let rec aff_aux a =
   match a with
   | [] -> ()
-  | t::q -> match t with
-            | I_or_D_instr i -> Printf.printf "decalaration\n"; 
-            | I_or_D_decl d -> Printf.printf "instruction\n";
-
-  ()
+  | t::q -> begin match t with
+            | I_or_D_instr i -> Printf.printf "decalaration\n";  
+            | I_or_D_decl d -> Printf.printf "instruction\n"; end;
+  aff_aux q
 let affiche = aff_aux
     
-  
+(* ____________________PRINTING_______________________________*)
+let rec print_id (Id s) = print_string s
+
+and print_const = function
+  | Cst_int i -> print_string "cst:";print_int i
+  | Cst_float f -> print_string "cst:";print_float f
+  | Cst_bool b -> print_string "cst:";print_string (string_of_bool b)
+  | Cst_string s -> print_string "cst:";print_string s
+
+and print_type = function
+  | Identifiant s -> print_string s
+  | Constante c -> print_const c
+  | Number -> print_string "Number"
+  | Boolean -> print_string "Boolean"
+  | String -> print_string "String"
+  | Tableau t -> print_string "Tableau of "; print_type t
+  | Any -> print_string "Any"
+  | Object champs -> print_string "Object of "; print_champs champs
+  | Union types -> print_string "Union of "; List.iter print_type types
+
+and print_champs = function
+  | [] -> ()
+  | [(id, t_opt)] -> print_id id; print_string ": "; (match t_opt with None -> () | Some t -> print_type t)
+  | (id, t_opt) :: q -> print_id id; print_string ": "; (match t_opt with None -> () | Some t -> print_type t); print_string ", "; print_champs q
+
+and print_left = function
+  | Left_id s -> print_string s
+  | Tab_affect (e1, e2) -> print_string "Tab_affect of "; print_expr e1; print_string ", "; print_expr e2
+  | Point_sep (e, Id s) -> print_string "Point_sep of "; print_expr e; print_string ", "; print_string s
+
+and print_expr = function
+  | Par e -> print_string "Par of "; print_expr e
+  | Cst c -> print_const c
+  | Left_mem l -> print_left l
+  | Obj id_expr_list -> print_string "Obj of "; List.iter (fun (id, e) -> print_id id; print_string ": "; print_expr e) id_expr_list
+  | Tab expr_list -> print_string "Tab of "; List.iter print_expr expr_list
+  | Func_call (e, expr_list) -> print_string "Func_call of "; print_expr e; print_string ", "; List.iter print_expr expr_list
+  | Typeof e -> print_string "Typeof of "; print_expr e
+  | Plus e -> print_string "Plus of "; print_expr e
+  | Minus e -> print_string "Minus of "; print_expr e
+  | Exp (e1, e2) -> print_string "Exp of "; print_expr e1; print_string ", "; print_expr e2
+  | Mul (e1, e2) -> print_string "Mul of "; print_expr e1; print_string ", "; print_expr e2
+  | Div (e1, e2) -> print_string "Div of "; print_expr e1; print_string ", "; print_expr e2
+  | Add (e1, e2) -> print_string "Add of "; print_expr e1; print_string ", "; print_expr e2
+  | Sub (e1, e2) -> print_string "Sub of "; print_expr e1; print_string ", "; print_expr e2
+  | GT (e1, e2) -> print_string "GT of "; print_expr e1; print_string ", "; print_expr e2
+  | GE (e1, e2) -> print_string "GE of "; print_expr e1; print_string ", "; print_expr e2
+  | LT (e1, e2) -> print_string "LT of "; print_expr e1; print_string ", "; print_expr e2
+  | LE (e1, e2) -> print_string "LE of "; print_expr e1; print_string ", "; print_expr e2
+  | Eq (e1, e2) -> print_string "Eq of "; print_expr e1; print_string ", "; print_expr e2
+  | Diff (e1, e2) -> print_string "Diff of "; print_expr e1; print_string ", "; print_expr e2
+  | Triple_eq (e1, e2) -> print_string "Triple_eq of "; print_expr e1; print_string ", "; print_expr e2
+  | Double_diff (e1, e2) -> print_string "Double_diff of "; print_expr e1; print_string ", "; print_expr e2
+  | Conj (e1, e2) -> print_string "Conj of "; print_expr e1; print_string ", "; print_expr e2
+  | Disj (e1, e2) -> print_string "Disj of "; print_expr e1; print_string ", "; print_expr e2
+  | Affect (l, e) -> print_string "Affect of "; print_left l; print_string ", "; print_expr e
+
+and print_instr = function
+  | Empty -> print_string "Empty"
+  | Pt_virgule e -> print_expr e; print_string "Pt_virgule"; 
+  | Bloc inst_or_decl_list -> print_string "Bloc of "; List.iter print_inst_or_decl inst_or_decl_list
+  | Var_decl bindings -> print_string "Var_decl of "; print_bindings bindings
+  | If (e, i, None) -> print_string "If of "; print_expr e; print_string ", "; print_instr i
+  | If (e, i, Some i2) -> print_string "If of "; print_expr e; print_string ", "; print_instr i; print_string ", "; print_instr i2
+  | While (e, i) -> print_string "While of "; print_expr e; print_string ", "; print_instr i
+  | Return None -> print_string "Return None"
+  | Return Some e -> print_string "Return of "; print_expr e
+
+and print_binding (Binding (id, t_opt, e_opt)) =
+  print_id id;
+  (match t_opt with
+  | None -> ()
+  | Some t -> print_string ": "; print_type t);
+  (match e_opt with
+  | None -> ()
+  | Some e -> print_string " = "; print_expr e)
+
+and print_bindings bindings = List.iter print_binding bindings
+
+and print_inst_or_decl = function
+  | I_or_D_instr i -> print_instr i
+  | I_or_D_decl d -> print_decl d
+
+and print_decl = function
+  | Type_alias (id, t) -> print_string "Type_alias of "; print_id id; print_string ", "; print_type t
+  | Let_decl bindings -> print_string "Let_decl of "; print_bindings bindings
+  | Const_decl bindings -> print_string "Const_decl of "; print_bindings bindings
+  | Func_decl (id, bindings, t_opt, inst_or_decl_list) ->
+    print_string "Func_decl of "; print_id id; print_string ", "; print_bindings bindings;
+    (match t_opt with
+    | None -> ()
+    | Some t -> print_string ": "; print_type t);
+    print_string ", "; List.iter print_inst_or_decl inst_or_decl_list
+
+and print_ast ast = List.iter print_inst_or_decl ast

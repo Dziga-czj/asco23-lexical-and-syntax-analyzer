@@ -7,25 +7,20 @@ type const =
   | Cst_bool of bool
   | Cst_string of string
 
-type prim =
-  | Num of int
-  | Bool of bool
-  | Str of string
-
-type type_ = 
-  | Identifiant
-  | Constante
+and type_ = 
+  | Identifiant of string
+  | Constante of const
   | Number
   | Boolean
   | String
-  | Tableau
+  | Tableau of type_
   | Any
-  | Object
-  | Union
+  | Object of (id * type_ option) list
+  | Union of type_ list
 
 (* and sers a ce que il reconaisse tout les types en même temps pour pouvoir les utiliser mutuellement *)
 and left = 
-  | Id of string
+  | Left_id of string
   | Tab_affect of (expr * expr) (* e[e] *)
   | Point_sep of (expr * id) (* e.i *)
 
@@ -65,11 +60,7 @@ and instr =
   | While of expr * instr
   | Return of expr option
 
-and binding =  
-  | Bind_Simple of id (* var a*)
-  | Bind_Double of id * type_ * expr (* var a : type = expr; *)
-  | Bind_typed of id * type_ (* var a : type;*)
-  | Bind_expr of id * expr (* var a = expr; *)
+and binding = Binding of id * type_ option * expr option
 
 and inst_or_decl = 
   | I_or_D_instr of instr 
@@ -84,3 +75,8 @@ and decl =
 and ast = inst_or_decl list
 
 val affiche : ast -> unit
+
+val print_ast : ast -> unit
+val print_expr : expr -> unit
+val print_decl : decl -> unit
+val print_instr : instr -> unit

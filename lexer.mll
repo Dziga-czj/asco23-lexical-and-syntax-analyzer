@@ -1,20 +1,26 @@
 {
     open Parser
     let int_of_string2 i = int_of_string (String.concat "" (String.split_on_char '_' i)) 
-    let int_of_string3 beg i = int_of_string (beg ^ (String.sub (String.concat "" (String.split_on_char '_' i)) 2 (String.length i - 2)))
-    let float_of_string2 i = float_of_string (String.concat "" (String.split_on_char '_' i))
+    let int_of_string3 beg i = 
+        let l = (String.concat "" (String.split_on_char '_' i)) in
+        int_of_string l
+    let float_of_string2 i = 
+        let l = (String.concat "" (String.split_on_char '_' i)) in
+        float_of_string l
 }
 
 rule decoupe = parse
-| "//" [^'\n']* '\n' { EOL } 
+| "//" [^'\n']* '\n' { decoupe lexbuf } 
 | "/*" ( [^'*'] | ('*' [^'/']) )* "*/" { decoupe lexbuf }
-| [' ' '\t' '\r' '\n'] { EOL } 
+| " " { decoupe lexbuf } 
+| "-" { Minus }
 | '+' { Plus }
 | '*' { Times }
 | '(' { Lpar }
 | ')' { Rpar }
-| '\n' { EOL }
-| '\r' { EOL }
+| '\t' { decoupe lexbuf }
+| '\n' { decoupe lexbuf }
+| '\r' { decoupe lexbuf }
 | eof { EOF }
 | "typeof" { Typeof }
 | "**" { Exp }
@@ -49,7 +55,9 @@ rule decoupe = parse
 | "let" { Let }
 | "const" { Const }
 | "function" { Function }
+| "any" { Any }
 | "." { Point}
+| "|" { Barre }
 (*------------------------- constantes -------------------------*)
 (* const decimales *)
 | ['1'-'9']['0'-'9''_']* as i { Cst_int (int_of_string2 i) }
@@ -75,11 +83,12 @@ rule decoupe = parse
 | ['0'-'9''_']+ ['e''E'] ['+' '-']? ['0'-'9''_']+ as i { Cst_float (float_of_string2 i) }
 
 | "True"|"False" as b { Cst_bool (if b = "True" then true else false)}
+| "true"|"false" as b { Cst_bool (if b = "true" then true else false)}
 (* identifiants *)
 | ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''0'-'9''_']* as s { Id(s)}
 
-| '"'([^'"']|"\\\"")*'"' as s { Cst_string (String.sub s 1 (String.length s -2)) }
-| "'"([^''']|"\\'")*"'" as s { Cst_string (String.sub s 1 (String.length s -2)) }
+| '"'([^'"']|"\\\"")*'"' as s { Cst_string (String.sub s 1 ((String.length s) -2)) }
+| "'"([^''']|"\\'")*"'" as s { Cst_string (String.sub s 1 ((String.length s) -2)) }
 | _ as c { failwith ("Unexpected character: " ^ Char.escaped c) }
 {
     (*trailer*)

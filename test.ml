@@ -1,7 +1,5 @@
 let lexbuf = Lexing.from_channel stdin
 
-type file = string * string list
-
 exception End_of_file
 
 let _ =
@@ -20,13 +18,15 @@ let _ =
     | (s,l)::q -> 
       List.iter (fun x -> 
         let file = "tests/"^s^"/"^x in
-        Printf.printf "testing %s\n" file;
-        let lexbuf = Lexing.from_channel (open_in file) in
+        Printf.printf "\ntesting %s\n\n" file;
+        flush stdout;
+        let f = open_in file in
+        let lexbuf = Lexing.from_channel f in
         try 
           while true do
             let r = Parser.s (Lexer.decoupe) lexbuf in
             if r = [] then raise End_of_file
           done
-        with End_of_file -> ()
+        with End_of_file -> close_in f;
       ) l
       in aux a

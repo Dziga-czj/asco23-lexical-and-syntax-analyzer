@@ -7,7 +7,7 @@ f(["", "1"]);
 
 
 type square = { color : string;
-		side : number };
+side : number };
 
 type circle = { radius : number, color : string, };
 
