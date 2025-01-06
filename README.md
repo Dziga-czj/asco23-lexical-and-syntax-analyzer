@@ -24,8 +24,8 @@ $ cat input.txt | ./test_parser
 ```
 
 ### test :
-Cet exécutable est fait pour lancer tout les tests donnés. Ici, tout les tests concernant la partie parser passent quand il le faut, et prduisent une erreur quand la syntaxe n'est pas bonne.
-Les autres tests de type quand à eux ne sont pas encore implémentés, donc ne passent pas.
+Cet exécutable est fait pour lancer tout les tests de syntaxe, de types etc. 
+Le programme s'arrête quand un des test qui est sensé passer ne passe pas, et inversement.
 ```
 $ ./test
 ```
