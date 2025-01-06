@@ -74,7 +74,7 @@ and decl =
 
 and ast = inst_or_decl list
 
-val affiche : ast -> unit
+val check_scope : ast -> bool
 
 val print_ast : ast -> unit
 val print_expr : expr -> unit

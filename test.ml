@@ -5,7 +5,7 @@ exception End_of_file
 let testing s l =
   List.iter (fun x -> 
     let file = "tests/"^s^"/"^x in
-    Printf.printf "\ntesting %s\n\n" file;
+    Printf.printf "testing %s\n\n" file;
     flush stdout;
     let f = open_in file in
     let lexbuf = Lexing.from_channel f in
@@ -46,7 +46,7 @@ let _ =
             | [] -> ()
             | t::q -> 
                 let file = "tests/"^s^"/"^t in
-                Printf.printf "\ntesting %s\n" file;
+                Printf.printf "testing %s\n" file;
                 flush stdout;
                 let f = open_in file in
                 let lexbuf = Lexing.from_channel f in

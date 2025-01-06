@@ -1,6 +1,8 @@
 %{
     open Ast
 
+    let debug = true
+
     let print_debug s = print_string s; print_newline (); flush stdout
 %}
 
@@ -39,8 +41,8 @@ s : decl_instr_list EOF { $1 } (* prend une liste de déclarations ou instructio
 (* Déclarations et instructions *)
 
 decl_instr :
-  | decl { print_decl $1; print_newline (); flush stdout; I_or_D_decl $1 } (* une déclaration *)
-  | instr { print_instr $1; print_newline (); flush stdout; I_or_D_instr $1 } (* une instruction *)
+  | decl { if debug then begin print_decl $1; print_debug ""; end; I_or_D_decl $1 } (* une déclaration *)
+  | instr { if debug then begin print_instr $1; print_debug ""; end;  I_or_D_instr $1 } (* une instruction *)
 
 decl_instr_list :
   | { [] }

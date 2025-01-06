@@ -75,26 +75,39 @@ and decl =
 and ast = inst_or_decl list
 
 
-
-let print_sep l =
-  List.iter print_string l
-
-let rec print_sep_spec = function
-  | [] -> ()
-  | [x] -> print_string "|-"
-  | x :: q -> print_string x; print_sep_spec q
+module Table = Map.Make(String)
 
 
-let rec aff_aux a =
-  match a with
-  | [] -> ()
-  | t::q -> begin match t with
-            | I_or_D_instr i -> Printf.printf "decalaration\n";  
-            | I_or_D_decl d -> Printf.printf "instruction\n"; end;
-  aff_aux q
-let affiche = aff_aux
+let add_scope_decl i table =
+  table
+  (*TODO*)
+
+let check_scope_instr i table =
+  true
+  (*TODO*)
+
+let check_scope a =
+
+  let table = Table.empty in
+
+
+  let rec aux curr acc table =
+    match curr with
+    | [] -> acc
+    | t::q -> match t with
+              | I_or_D_instr i -> let acc' = check_scope_instr i table in aux q acc' table
+              | I_or_D_decl d -> let table' = add_scope_decl d table in aux q acc table'
+
+
+
+  in aux a true table
+
+
+
+
+
     
-(* ____________________PRINTING_______________________________*)
+(* ________________________________________PRINTING___________________________________________________*)
 let rec print_id (Id s) = print_string s
 
 and print_const = function
