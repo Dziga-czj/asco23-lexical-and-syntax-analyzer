@@ -1,5 +1,7 @@
 %{
     open Ast
+
+    let print_debug s = print_string s; print_newline (); flush stdout
 %}
 
 %token Plus EOF Times Minus Any Lpar Rpar Point Comment Barre Typeof Exp Div Comp_lt Comp_le Comp_gt Comp_ge Eq Double_eq Triple_eq Diff Double_diff And Or Type_num Type_bool Type_string LBracket RBracket LAcc RAcc PVirgule Virgule DPoints Var_decl If Else While Return Type Let Const Function
@@ -8,6 +10,7 @@
 %token <bool> Cst_bool
 %token <string> Cst_string
 %token <string> Id
+%token <string> Unbound_element
 %token Comment
 
 
@@ -46,7 +49,7 @@ decl_instr_list :
 decl : 
   | Type Id Eq type_expr PVirgule { Type_alias (Id $2, $4) }
   | Let bindings PVirgule { Let_decl $2 }
-  | Const bindings PVirgule { flush stdout; Const_decl $2 }
+  | Const bindings PVirgule { Const_decl $2 }
   | Function Id Lpar possible_empty_bindings Rpar to_ LAcc decl_instr_list RAcc { Func_decl (Id($2), $4, $6, $8) }
 
 possible_empty_bindings:
@@ -122,14 +125,10 @@ expr_list :
 
 
 (* Objets *)
-
-pt_v_or_virgule :
-  | PVirgule { }
-  | Virgule { }
-
 obj_list :
   | Id DPoints expr { [(Id $1, $3)] } 
-  | Id DPoints expr pt_v_or_virgule obj_list { (Id $1, $3) :: $5 } 
+  | Id DPoints expr Virgule obj_list { (Id $1, $3) :: $5 } 
+  | Id DPoints expr Virgule obj_list Virgule { (Id $1, $3) :: $5 } 
 
 to_:
   | { None }
@@ -140,8 +139,8 @@ eo:
   | Eq expr { Some $2 }
 
 binding :
-  | Id to_ eo {Binding (Id $1, $2, $3) }  (* var a *)
-
+  | Id to_ eo { Binding (Id $1, $2, $3) }  (* var a *)
+ 
 
 bindings :
   | binding { [$1] } (* une déclaration *)
@@ -169,11 +168,15 @@ type_expr :
   | LAcc type_obj RAcc { Object $2 }
   | type_expr Barre union_type { Union ($1::$3) }
 
+pt_v_or_virgule :
+  | PVirgule { None }
+  | Virgule { None }
 
 type_obj :
   | { [] }
-  | id_or_type pt_v_or_virgule type_obj { $1::$3 }
-
+  | Id to_ { [(Id $1,$2)] }
+  | Id to_ pt_v_or_virgule type_obj { (Id $1,$2)::$4 }
+  | Id to_ pt_v_or_virgule type_obj pt_v_or_virgule { (Id $1,$2)::$4 }
 
 union_type :
   | type_expr { [$1] }

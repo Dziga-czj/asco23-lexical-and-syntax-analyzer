@@ -80,3 +80,4 @@ val print_ast : ast -> unit
 val print_expr : expr -> unit
 val print_decl : decl -> unit
 val print_instr : instr -> unit
+val print_binding : binding -> unit
