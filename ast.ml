@@ -74,36 +74,59 @@ and decl =
 
 and ast = inst_or_decl list
 
+exception Undeclared_variable of string
 
 module Table = Map.Make(String)
 
+(*last : "ordre" de déclaration. toujours le dernier available*)
+type table_type = { last: int; table: Table.t}
 
-let add_scope_decl i table =
-  table
-  (*TODO*)
+(* idée : pour chaque bloc, déclaration de fonction etc on relance la recherche avec la table courante 
+  donc si c'est local, on aura toutes les déclarations d'avant et on sauvegarde pas la table
+  si c'est global, on mets a jour la table,
+  etc
+*)
+let add_id i t =
+  if Table.mem i t.table then t
+  else let tb' = Table.add i t.table t.last in
+    {last = t.last +1; table = tb'}
+
+let add_b_list b_list t =
+  match b_list with
+  | [] -> t
+  | h::q -> let Binding(i, typ, exp) = h in
+
+
+let check_scope_decl d table : (bool * Table.t) =
+  match d with 
+  | Type_alias (i, t) -> failwith "TODO"
+  | Let_decl (b_list) -> 
+  | Const_decl (b_list) -> 
+  | Func_decl of (i, b_list, typ, inst_or_decl_l) -> let table' = add_id i table in
+                                                    let table' = add_b_list b_list table' in 
+                                                    check_i_or_d_l_scope inst_or_decl_l table'
 
 let check_scope_instr i table =
   true
-  (*TODO*)
+  (*TODO *)
 
-let check_scope a =
 
-  let table = Table.empty in
-
+let check_i_or_d_l_scope l table =
 
   let rec aux curr acc table =
     match curr with
     | [] -> acc
     | t::q -> match t with
-              | I_or_D_instr i -> let acc' = check_scope_instr i table in aux q acc' table
-              | I_or_D_decl d -> let table' = add_scope_decl d table in aux q acc table'
+              | I_or_D_instr i -> let acc' = check_scope_instr i table in aux q acc' table'
+              | I_or_D_decl d -> let table' = check_scope_decl d table in aux q acc' table'
 
 
 
   in aux a true table
 
 
-
+let check_scope a =
+  check_i_or_d_l_scope a Table.empty
 
 
     
