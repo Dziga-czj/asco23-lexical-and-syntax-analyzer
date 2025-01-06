@@ -94,21 +94,61 @@ let add_id i t =
 let add_b_list b_list t =
   match b_list with
   | [] -> t
-  | h::q -> let Binding(i, typ, exp) = h in
+  |  (Binding(i, typ, exp))::q ->
+    if Table.mem i t.table then
+      add_b_list q t
+    else
+      let updated_table = Table.add i t.table t.last in
+      let updated_table = { t with last = t.last + 1; table = updated_table } in
+      add_b_list q updated_table
 
 
-let check_scope_decl d table : (bool * Table.t) =
+let check_scope_decl d table : Table.t =
   match d with 
   | Type_alias (i, t) -> failwith "TODO"
-  | Let_decl (b_list) -> 
-  | Const_decl (b_list) -> 
+  | Let_decl (b_list) -> add_b_list b_list table
+  | Const_decl (b_list) -> add_b_list b_list table
+  (*pour la fonction on ajoute l'id a la table globale
+  on ajoute les paramètres a la table avec add_b_list
+  puis on check les instr et decl dans la fonction*)
   | Func_decl of (i, b_list, typ, inst_or_decl_l) -> let table' = add_id i table in
                                                     let table' = add_b_list b_list table' in 
                                                     check_i_or_d_l_scope inst_or_decl_l table'
 
 let check_scope_instr i table =
-  true
-  (*TODO *)
+  match i with ->
+    | Empty -> table
+    | Pt_virgule expr -> check_scope_expr expr table
+    | Bloc inst_or_decl_list ->
+      let rec aux acc curr_table = 
+        match curr with
+        | [] -> acc
+        | hd :: tl ->
+          match hd with ->
+            | I_or_D_instr instr -> 
+              let new_table = check_scope_instr instr curr_table in
+              aux acc new_table tl
+            | I_or_D_decl decl -> 
+              let new_table = check_scope_decl decl curr_table in
+              aux acc new_table tl
+      in aux table inst_or_decl_list
+    | Var_decl b_list ->
+      add_b_list b_list table
+    | If (cond, then_instr, else_instr_opt) -> 
+      let table_after_cond = check_scope_expr cond table in
+      let table_after_then = check_scope_instr then_instr table_after_cond in
+      (match else_instr_opt with
+        | None -> table_after_then
+        | Some else_instr -> check_scope_instr else_instr table_after_then)
+    
+    | While (cond, body_instr) -> 
+        let table_after_cond = check_scope_expr cond table in
+        check_scope_instr body_instr table_after_cond
+    
+    | Return expr_opt -> 
+      (match expr_opt with
+      | None -> table
+      | Some expr -> check_scope_expr expr table)
 
 
 let check_i_or_d_l_scope l table =
@@ -120,15 +160,10 @@ let check_i_or_d_l_scope l table =
               | I_or_D_instr i -> let acc' = check_scope_instr i table in aux q acc' table'
               | I_or_D_decl d -> let table' = check_scope_decl d table in aux q acc' table'
 
-
-
   in aux a true table
-
 
 let check_scope a =
   check_i_or_d_l_scope a Table.empty
-
-
     
 (* ________________________________________PRINTING___________________________________________________*)
 let rec print_id (Id s) = print_string s
