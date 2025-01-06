@@ -5,24 +5,13 @@ module Table = Map.Make(String)
 type tab = { table: Table.t }
 
 exception Not_declared of string
+exception Type_error of string
 
 let refresh_type i t tab =
   if Table.mem i table then Table.update i t table
   else Table.add i t table
 
-(* type_ = 
-  | Identifiant of string
-  | Constante of const
-  | Number
-  | Boolean
-  | String
-  | Tableau of type_
-  | Any
-  | Object of (id * type_ option) list
-  | Union of type_ list
-  *)
-
-let equal_types t1 t2 =
+let rec equal_types t1 t2 =
   if t2 = Any || t1 = Any then true
   else
   match t1 with
@@ -52,7 +41,8 @@ let equal_types t1 t2 =
     else false
     | _ -> false
 
-
+let check_exp_type e tab =
+  failwith "TODO"
 
 let test_types i t tab =
   if not Table.mem i tab then raise Not_declared (i)
@@ -61,9 +51,10 @@ let test_types i t tab =
   equal_types t1 t
 
 
-let check_b_list_type l inp_table = 
+let set_b_list_type l inp_table = 
 
     List.fold_left (fun table x ->
+
       let Binding(i, t_opt, exp_opt) = x in
       let table' = 
         match t_opt with
@@ -74,7 +65,8 @@ let check_b_list_type l inp_table =
         match exp_opt with
         | None -> table'
         | Some exp -> test_types i (check_exp_type exp table') table'
-      
+      in
+      table'
     
     ) inp_table l 
 
@@ -89,9 +81,18 @@ let check_type_instr i =
 let check_type_decl d table =
   match d with
   | Type_alias (i, t) -> refresh_type i t table
-  | Let_decl (b_list) -> check_b_list_type b_list table
-  | Const_decl (b_list) -> check_b_list_type b_list table
-  | Func_decl of (i, b_list, typ, inst_or_decl_l) ->
+  | Let_decl (b_list) -> set_b_list_type b_list table
+  | Const_decl (b_list) -> set_b_list_type b_list table
+  | Func_decl of (i, b_list, typ, inst_or_decl_l) -> let t = match typ with
+                                                    | None -> Any
+                                                    | Some t' -> t'
+                                                  in
+                                                  let table' = refresh_type i t table in
+                                                  
+                                                  let rt = get_func_return_type inst_or_decl_l in
+                                                  if not equal_types rt t then raise Type_error (i)
+                                                  
+
 
 
 let check_type a =

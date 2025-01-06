@@ -71,7 +71,7 @@ and decl =
   | Let_decl of binding list
   | Const_decl of binding list
   | Func_decl of id * binding list * type_ option * inst_or_decl list
-
+    
 and ast = inst_or_decl list
 
 
