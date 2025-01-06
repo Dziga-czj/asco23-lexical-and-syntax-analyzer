@@ -73,7 +73,7 @@ and decl =
   | Func_decl of id * binding list * type_ option * inst_or_decl list
 
 and ast = inst_or_decl list
-
+(*
 exception Undeclared_variable of string
 
 module Table = Map.Make(String)
@@ -112,7 +112,6 @@ let check_scope_instr i table =
 
 
 let check_i_or_d_l_scope l table =
-
   let rec aux curr acc table =
     match curr with
     | [] -> acc
@@ -128,8 +127,8 @@ let check_i_or_d_l_scope l table =
 let check_scope a =
   check_i_or_d_l_scope a Table.empty
 
+*)
 
-    
 (* ________________________________________PRINTING___________________________________________________*)
 let rec print_id (Id s) = print_string s
 

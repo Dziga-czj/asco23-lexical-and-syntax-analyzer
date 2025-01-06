@@ -1,0 +1,1 @@
+val check_type : ast -> bool
