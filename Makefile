@@ -23,7 +23,7 @@ parser.cmi: parser.mli ast.cmo
 test_parser: ast.cmo parser.cmo lexer.cmo test_parser.cmo
 	ocamlc -o $@ $^
 
-test: ast.cmo parser.cmo lexer.cmo test.cmo
+test: ast.cmo parser.cmo lexer.cmo test.cmo 
 	ocamlc -o $@ $^
 
 usage:
