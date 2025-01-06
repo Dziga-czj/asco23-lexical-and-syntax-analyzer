@@ -11,7 +11,8 @@ $ make test_parser
 ## usage :
 Avec un fichier de test "input.txt"
 ### test_decoupe :
-Ceci est un simple test pour le lexer. Le test est repri du TP n°3 ou l'on ne fait que découper le texte.
+Ceci est un simple test pour le lexer. Le test est repri du TP n°3 ou l'on ne fait que découper le texte.  
+Son comportement est de renvoyer une erreur si il y a quelque chose que le lexer ne peut pas interpréter, et ne s'arrête pas sinon.
 ```
 $ cat input.txt | ./test_decoupe
 ```
@@ -28,3 +29,7 @@ Les autres tests de type quand à eux ne sont pas encore implémentés, donc ne 
 ```
 $ ./test
 ```
+
+## Debug
+Il y a la possibilité d'afficher les morceaux de l'ast qui ont été "parsé" grâce au mode débug. 
+On peut activer ou désactiver cet affichage en changeant la valeur de la constante "debug" dans les déclarations en haut du fichier "parser.mly" 
