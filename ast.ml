@@ -77,33 +77,143 @@ and ast = inst_or_decl list
 
 module Table = Map.Make(String)
 
+type decl_info = {
+  decl_type: [ `Var | `Let | `Const ]; 
+  mutable_flag: bool;                   
+}
 
-let add_scope_decl i table =
-  table
-  (*TODO*)
+type table = decl_info Table.t   
 
-let check_scope_instr i table =
-  true
-  (*TODO*)
+  let check_scope ast =
+    (* Pile de scopes : chaque scope est une table locale *)
+    let rec push_scope stack = Table.empty :: stack
+    and pop_scope = function
+      | [] -> failwith "Scope stack underflow"
+      | _::q -> q
+    in
+  
+    let rec find_in_scopes id = function
+      | [] -> None
+      | scope::rest -> 
+          (match Table.find_opt id scope with
+           | Some info -> Some info
+           | None -> find_in_scopes id rest)
+    in
+  
+    (* Vérifie les affectations *)
+    let check_assignment left_expr stack =
+      match left_expr with
+      | Left_id id -> (
+          match find_in_scopes id stack with
+          | Some { decl_type = `Const; _ } -> 
+              failwith ("Cannot assign to constant variable: " ^ id)
+          | Some _ -> ()  (* OK *)
+          | None -> failwith ("Variable not declared: " ^ id)
+        )
+      | _ -> ()  (* Ignorer les autres cas d'affectation pour le moment *)
+    in
+  
+    let rec aux curr stack =
+      match curr with
+      | [] -> true
+      | t::q -> (
+          match t with
+          | I_or_D_instr instr -> 
+              let stack' = check_scope_instr instr stack in
+              aux q stack'
+          | I_or_D_decl decl -> 
+              let stack' = check_scope_decl decl stack in
+              aux q stack'
+        )
+    and check_scope_instr instr stack =
+      match instr with
+      | Var_decl bindings -> 
+          let current_scope = List.hd stack in
+          let updated_scope = 
+            List.fold_left (fun scope (Binding (Id id, typ, _)) ->
+              Table.add id { decl_type = `Var; mutable_flag = true; decl_type_opt = typ } scope
+            ) current_scope bindings
+          in
+          updated_scope :: (List.tl stack)
+      | Bloc block -> 
+          let stack' = push_scope stack in
+          let _ = aux block stack' in
+          pop_scope stack'
+      | Func_call (Left_id id, _) -> (
+          match find_in_scopes id stack with
+          | Some { decl_type = `Let; _ } -> stack  (* OK : fonction trouvée *)
+          | None -> failwith ("Function not declared: " ^ id)
+        )
+      | _ -> stack  (* Autres instructions *)
+      let check_scope_instr instr stack =
+  match instr with
+  | Var_decl bindings -> 
+      let current_scope = List.hd stack in
+      let updated_scope = 
+        List.fold_left (fun scope (Binding (Id id, typ, _)) ->
+          Table.add id { decl_type = `Var; mutable_flag = true; decl_type_opt = typ } scope
+        ) current_scope bindings
+      in
+      updated_scope :: (List.tl stack)
+  | Affect (left, _) -> 
+      check_assignment left stack; stack  (* Vérification des affectations *)
+  | Pt_virgule _ -> stack  (* Le point-virgule ne change rien à la pile de scopes *)
+  | Bloc block -> 
+      let stack' = push_scope stack in
+      let _ = aux block stack' in
+      pop_scope stack'  (* Bloc de code avec un scope local *)
+  | Func_call (left, _) -> 
+      (* Vérification si la fonction a été déclarée dans le scope *)
+      let id = match left with
+        | Left_id id -> id
+        | _ -> failwith "Invalid function call expression"
+      in
+      match find_in_scopes id stack with
+      | Some { decl_type = `Let; _ } -> ()  (* OK, la fonction est déclarée *)
+      | _ -> failwith ("Function not declared: " ^ id);
+      stack
+  | _ -> stack  (* Autres instructions non traitées *)
 
-let check_scope a =
-
-  let table = Table.empty in
-
-
-  let rec aux curr acc table =
-    match curr with
-    | [] -> acc
-    | t::q -> match t with
-              | I_or_D_instr i -> let acc' = check_scope_instr i table in aux q acc' table
-              | I_or_D_decl d -> let table' = add_scope_decl d table in aux q acc table'
-
-
-
-  in aux a true table
-
-
-
+    and check_scope_decl decl stack =
+      match decl with
+      | Let_decl bindings -> 
+          let current_scope = List.hd stack in
+          let updated_scope = 
+            List.fold_left (fun scope (Binding (Id id, typ, _)) ->
+              Table.add id { decl_type = `Let; mutable_flag = true; decl_type_opt = typ } scope
+            ) current_scope bindings
+          in
+          updated_scope :: (List.tl stack)
+      | Const_decl bindings -> 
+          let current_scope = List.hd stack in
+          let updated_scope = 
+            List.fold_left (fun scope (Binding (Id id, typ, _)) ->
+              Table.add id { decl_type = `Const; mutable_flag = false; decl_type_opt = typ } scope
+            ) current_scope bindings
+          in
+          updated_scope :: (List.tl stack)
+      | Func_decl (Id id, bindings, return_type, body) -> 
+          (* Ajouter la fonction elle-même au scope courant *)
+          let current_scope = List.hd stack in
+          let func_scope = Table.add id { decl_type = `Let; mutable_flag = false; decl_type_opt = return_type } current_scope in
+          
+          (* Créer un nouveau scope pour les paramètres de la fonction *)
+          let param_scope = 
+            List.fold_left (fun scope (Binding (Id param_id, typ, _)) ->
+              Table.add param_id { decl_type = `Let; mutable_flag = true; decl_type_opt = typ } scope
+            ) Table.empty bindings
+          in
+  
+          (* Traiter le corps de la fonction avec un nouveau scope *)
+          let stack' = param_scope :: (func_scope :: (List.tl stack)) in
+          let _ = aux body stack' in
+          stack
+      | _ -> stack
+    in
+  
+    (* Initialisation avec un scope global *)
+    aux ast [Table.empty]
+  
 
 
     
