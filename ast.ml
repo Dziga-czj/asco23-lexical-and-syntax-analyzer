@@ -1,4 +1,3 @@
-
 type id = Id of string
 
 type const =    
@@ -73,98 +72,6 @@ and decl =
   | Func_decl of id * binding list * type_ option * inst_or_decl list
 
 and ast = inst_or_decl list
-
-exception Undeclared_variable of string
-
-module Table = Map.Make(String)
-
-(*last : "ordre" de déclaration. toujours le dernier available*)
-type table_type = { last: int; table: Table.t}
-
-(* idée : pour chaque bloc, déclaration de fonction etc on relance la recherche avec la table courante 
-  donc si c'est local, on aura toutes les déclarations d'avant et on sauvegarde pas la table
-  si c'est global, on mets a jour la table,
-  etc
-*)
-let add_id i t =
-  if Table.mem i t.table then t
-  else let tb' = Table.add i t.table t.last in
-    {last = t.last +1; table = tb'}
-
-let add_b_list b_list t =
-  match b_list with
-  | [] -> t
-  |  (Binding(i, typ, exp))::q ->
-    if Table.mem i t.table then
-      add_b_list q t
-    else
-      let updated_table = Table.add i t.table t.last in
-      let updated_table = { t with last = t.last + 1; table = updated_table } in
-      add_b_list q updated_table
-
-
-let check_scope_decl d table : Table.t =
-  match d with 
-  | Type_alias (i, t) -> failwith "TODO"
-  | Let_decl (b_list) -> add_b_list b_list table
-  | Const_decl (b_list) -> add_b_list b_list table
-  (*pour la fonction on ajoute l'id a la table globale
-  on ajoute les paramètres a la table avec add_b_list
-  puis on check les instr et decl dans la fonction*)
-  | Func_decl of (i, b_list, typ, inst_or_decl_l) -> let table' = add_id i table in
-                                                    let table' = add_b_list b_list table' in 
-                                                    check_i_or_d_l_scope inst_or_decl_l table'
-
-let check_scope_instr i table =
-  match i with ->
-    | Empty -> table
-    | Pt_virgule expr -> check_scope_expr expr table
-    | Bloc inst_or_decl_list ->
-      let rec aux acc curr_table = 
-        match curr with
-        | [] -> acc
-        | hd :: tl ->
-          match hd with ->
-            | I_or_D_instr instr -> 
-              let new_table = check_scope_instr instr curr_table in
-              aux acc new_table tl
-            | I_or_D_decl decl -> 
-              let new_table = check_scope_decl decl curr_table in
-              aux acc new_table tl
-      in aux table inst_or_decl_list
-    | Var_decl b_list ->
-      add_b_list b_list table
-    | If (cond, then_instr, else_instr_opt) -> 
-      let table_after_cond = check_scope_expr cond table in
-      let table_after_then = check_scope_instr then_instr table_after_cond in
-      (match else_instr_opt with
-        | None -> table_after_then
-        | Some else_instr -> check_scope_instr else_instr table_after_then)
-    
-    | While (cond, body_instr) -> 
-        let table_after_cond = check_scope_expr cond table in
-        check_scope_instr body_instr table_after_cond
-    
-    | Return expr_opt -> 
-      (match expr_opt with
-      | None -> table
-      | Some expr -> check_scope_expr expr table)
-
-
-let check_i_or_d_l_scope l table =
-  let rec aux curr acc table =
-    match curr with
-    | [] -> acc
-    | t::q -> match t with
-              | I_or_D_instr i -> let acc' = check_scope_instr i table in aux q acc' table'
-              | I_or_D_decl d -> let table' = check_scope_decl d table in aux q acc' table'
-
-  in aux a true table
-
-let check_scope a =
-  check_i_or_d_l_scope a Table.empty
-
-
 
 (* ________________________________________PRINTING___________________________________________________*)
 let rec print_id (Id s) = print_string s
