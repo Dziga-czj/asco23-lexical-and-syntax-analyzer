@@ -23,11 +23,11 @@ parser.cmi: parser.mli ast.cmo
 test_parser: ast.cmo parser.cmo lexer.cmo test_parser.cmo
 	ocamlc -o $@ $^
 
-test: ast.cmo parser.cmo lexer.cmo test.cmo
+test: ast.cmo parser.cmo lexer.cmo test.cmo 
 	ocamlc -o $@ $^
 
 usage:
-	@echo "Taper make test_decoupe ou make test_parser"
+	@echo "Taper make test_decoupe, test_parser ou test"
 
 clean:
 	-rm lexer.ml parser.ml parser.mli *.cmo *.cmi test_decoupe test_parser test
