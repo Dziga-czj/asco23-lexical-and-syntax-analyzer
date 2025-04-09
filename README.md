@@ -1,7 +1,7 @@
 
 # Analyseurs syntaxique et sémantique pour un sous-langage de TypeScript
 
-## Compilation :
+## Compilation :
 ```
 $ make test
 $ make test_decoupe
